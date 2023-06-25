@@ -4,3 +4,4 @@ venv
 replit.nix
 .env
 __pycache__
+*.json
