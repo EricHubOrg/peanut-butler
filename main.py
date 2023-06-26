@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import base64
 
-from discord import Intents, DMChannel
+from discord import Intents, DMChannel, utils
 from discord.ext import commands
 
 from keep_alive import keep_alive
@@ -13,6 +13,43 @@ from googleapiclient.errors import HttpError
 
 load_dotenv()
 
+def get_roles(ctx):
+	roles = ["simple mortal", "bots publics", "privilegiat", "alta taula", "CREADOR"]
+	return {name:utils.get(ctx.guild.roles, name=name) for name in roles}
+
+def get_deny_message(ctx):
+	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
+		return f'Ho sento {ctx.author.mention}, però no tens permís per fer això.'
+	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta-taula']), int(os.environ['CHANNEL_ID_test-bots'])]:
+		return f'Ho sento Creador, però aquests temes només els tractem a l\'{bot.get_channel(int(os.environ["CHANNEL_ID_alta-taula"])).mention}'
+	else:
+		return None
+
+def check_authority(ctx, level):
+	# level 0: >= simple mortal
+	# level 1: >= bots publics
+	# level 2: >= privilegiat
+	# level 3: >= alta taula
+	# level 4: == CREADOR
+	# level 5: == CREADOR (alta-taula or test-bots)
+	roles = get_roles(ctx)
+	author_role = ctx.author.top_role
+	print(roles)
+
+	if level == 0 and author_role < roles["simple mortal"]:
+		return 0
+	elif level == 1 and author_role < roles["bots publics"]:
+		return 0
+	elif level == 2 and author_role < roles["privilegiat"]:
+		return 0
+	elif level == 3 and author_role < roles["alta taula"]:
+		return 0
+	elif level == 4 and author_role != roles["CREADOR"]:
+		return 0
+	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta-taula']), int(os.environ['CHANNEL_ID_test-bots'])]:
+		return 0
+	return 1
+		
 intents = Intents.default()
 intents.message_content = True
 
@@ -30,15 +67,15 @@ async def on_ready():
 @bot.event
 async def on_message(message):
 	if message.author.bot:
-		# Ignore messages from other bots
+		# ignore messages from other bots
 		return
 
 	if isinstance(message.channel, DMChannel) or message.guild is None:
-		# Ignore private messages and messages outside of a server
+		# ignore private messages and messages outside of a server
 		await message.channel.send('Ho sento, però no pots conversar amb mi en privat.')
 		return
 
-	# Process messages in the server normally
+	# process messages in the server normally
 	await bot.process_commands(message)
 
 
@@ -48,13 +85,15 @@ async def test(ctx):
 		
 @bot.command()
 async def gmail(ctx):
-	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
-		await ctx.send('No tens permís per fer això.')
+	# check if the user has the authority to use this command
+	if not check_authority(ctx, 5):
+		await ctx.send(get_deny_message(ctx))
 		return
+	
 	try:
-		# Call the Gmail API
+		# call the Gmail API
 		service = build('gmail', 'v1', credentials=get_credentials())
-		# List all unread emails
+		# list all unread emails
 		results = service.users().messages().list(userId='me', q='is:unread').execute()
 		messages = results.get('messages', [])
 
@@ -65,7 +104,7 @@ async def gmail(ctx):
 			for message in messages:
 				msg = service.users().messages().get(userId='me', id=message['id']).execute()
 
-				# Get the subject and body of the message
+				# get the subject and body of the message
 				payload = msg['payload']
 				headers = payload['headers']
 				for d in headers:
@@ -78,10 +117,10 @@ async def gmail(ctx):
 
 				body = base64.urlsafe_b64decode(body).decode('utf-8')
 
-				# Print the subject and body of the message
-				await ctx.send(f'{subject}\{body}')
+				# print the subject and body of the message
+				await ctx.send(f'{subject}\n{body}')
 
-				# Mark the message as read
+				# mark the message as read
 				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
 
 	except HttpError as error:
