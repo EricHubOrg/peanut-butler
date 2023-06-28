@@ -34,7 +34,6 @@ def check_authority(ctx, level):
 	# level 5: == CREADOR (alta-taula or test-bots)
 	roles = get_roles(ctx)
 	author_role = ctx.author.top_role
-	print(roles)
 
 	if level == 0 and author_role < roles["simple mortal"]:
 		return 0
@@ -116,9 +115,14 @@ async def gmail(ctx):
 					body = payload['body']['data']
 
 				body = base64.urlsafe_b64decode(body).decode('utf-8')
+				limit = 80
+				# short body = until character `limit` without including the word that is cut and/or the last \n
+				short_body = body[:min(len(body), limit)].rsplit(' ', 1)[0]
+				if short_body[-1] == '\n':
+					short_body = short_body[:-1]
 
 				# print the subject and body of the message
-				await ctx.send(f'{subject}\n{body}')
+				await ctx.send(f':envelope: **{subject}**\n{short_body}{"..." if len(body) > limit else ""}')
 
 				# mark the message as read
 				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
