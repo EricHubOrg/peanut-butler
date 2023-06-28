@@ -5,3 +5,6 @@ replit.nix
 .env
 __pycache__
 *.json
+personality.txt
+test.py
+test2.py
