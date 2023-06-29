@@ -7,9 +7,9 @@ from discord.ext import commands
 
 from keep_alive import keep_alive
 
-from google_api import get_credentials
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+# from google_api import get_credentials
+# from googleapiclient.discovery import build
+# from googleapiclient.errors import HttpError
 
 load_dotenv()
 
@@ -82,55 +82,55 @@ async def on_message(message):
 async def test(ctx):
 	await ctx.send('Hello there!')
 		
-@bot.command()
-async def gmail(ctx):
-	# check if the user has the authority to use this command
-	if not check_authority(ctx, 5):
-		await ctx.send(get_deny_message(ctx))
-		return
+# @bot.command()
+# async def gmail(ctx):
+# 	# check if the user has the authority to use this command
+# 	if not check_authority(ctx, 5):
+# 		await ctx.send(get_deny_message(ctx))
+# 		return
 	
-	try:
-		# call the Gmail API
-		service = build('gmail', 'v1', credentials=get_credentials())
-		# list all unread emails
-		results = service.users().messages().list(userId='me', q='is:unread').execute()
-		messages = results.get('messages', [])
+# 	try:
+# 		# call the Gmail API
+# 		service = build('gmail', 'v1', credentials=get_credentials())
+# 		# list all unread emails
+# 		results = service.users().messages().list(userId='me', q='is:unread').execute()
+# 		messages = results.get('messages', [])
 
-		if not messages:
-			await ctx.send('No hi ha correus nous.')
-		else:
-			await ctx.send('Tens {} correus nous:'.format(len(messages)))
-			for message in messages:
-				msg = service.users().messages().get(userId='me', id=message['id']).execute()
+# 		if not messages:
+# 			await ctx.send('No hi ha correus nous.')
+# 		else:
+# 			await ctx.send('Tens {} correus nous:'.format(len(messages)))
+# 			for message in messages:
+# 				msg = service.users().messages().get(userId='me', id=message['id']).execute()
 
-				# get the subject and body of the message
-				payload = msg['payload']
-				headers = payload['headers']
-				for d in headers:
-					if d['name'] == 'Subject':
-						subject = d['value']
-				if 'parts' in payload:
-					body = payload['parts'][0]['body']['data']
-				else:
-					body = payload['body']['data']
+# 				# get the subject and body of the message
+# 				payload = msg['payload']
+# 				headers = payload['headers']
+# 				for d in headers:
+# 					if d['name'] == 'Subject':
+# 						subject = d['value']
+# 				if 'parts' in payload:
+# 					body = payload['parts'][0]['body']['data']
+# 				else:
+# 					body = payload['body']['data']
 
-				body = base64.urlsafe_b64decode(body).decode('utf-8')
-				limit = 80
-				# short body = until character `limit` without including the word that is cut and/or the last \n
-				short_body = body[:min(len(body), limit)].rsplit(' ', 1)[0]
-				if short_body[-1] == '\n':
-					short_body = short_body[:-1]
+# 				body = base64.urlsafe_b64decode(body).decode('utf-8')
+# 				limit = 80
+# 				# short body = until character `limit` without including the word that is cut and/or the last \n
+# 				short_body = body[:min(len(body), limit)].rsplit(' ', 1)[0]
+# 				if short_body[-1] == '\n':
+# 					short_body = short_body[:-1]
 
-				# print the subject and body of the message
-				await ctx.send(f':envelope: **{subject}**\n{short_body}{"..." if len(body) > limit else ""}')
+# 				# print the subject and body of the message
+# 				await ctx.send(f':envelope: **{subject}**\n{short_body}{"..." if len(body) > limit else ""}')
 
-				# mark the message as read
-				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+# 				# mark the message as read
+# 				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
 
-	except HttpError as error:
-		await ctx.send(f'An error occurred: {error}')
-	except:
-		await ctx.send('An error occurred: unknown')
+# 	except HttpError as error:
+# 		await ctx.send(f'An error occurred: {error}')
+# 	except:
+# 		await ctx.send('An error occurred: unknown')
 
 if __name__ == '__main__':
 	keep_alive()
