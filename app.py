@@ -20,8 +20,8 @@ def get_roles(ctx):
 def get_deny_message(ctx):
 	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
 		return f'Ho sento {ctx.author.mention}, però no tens permís per fer això.'
-	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta-taula']), int(os.environ['CHANNEL_ID_test-bots'])]:
-		return f'Ho sento Creador, però aquests temes només els tractem a l\'{bot.get_channel(int(os.environ["CHANNEL_ID_alta-taula"])).mention}'
+	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
+		return f'Ho sento Creador, però aquests temes només els tractem a l\'{bot.get_channel(int(os.environ["CHANNEL_ID_alta_taula"])).mention}'
 	else:
 		return None
 
@@ -31,7 +31,7 @@ def check_authority(ctx, level):
 	# level 2: >= privilegiat
 	# level 3: >= alta taula
 	# level 4: == CREADOR
-	# level 5: == CREADOR (alta-taula or test-bots)
+	# level 5: == CREADOR (alta_taula or test_bots)
 	roles = get_roles(ctx)
 	author_role = ctx.author.top_role
 
@@ -45,7 +45,7 @@ def check_authority(ctx, level):
 		return 0
 	elif level == 4 and author_role != roles["CREADOR"]:
 		return 0
-	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta-taula']), int(os.environ['CHANNEL_ID_test-bots'])]:
+	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
 		return 0
 	return 1
 		
