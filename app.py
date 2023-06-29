@@ -132,6 +132,5 @@ async def test(ctx):
 # 	except:
 # 		await ctx.send('An error occurred: unknown')
 
-if __name__ == '__main__':
-	keep_alive()
-	bot.run(os.environ['DISCORD_TOKEN'])
+keep_alive()
+bot.run(os.environ['DISCORD_TOKEN'])
