@@ -25,14 +25,14 @@ def run_bot():
 	bot.run(os.environ['DISCORD_TOKEN'])
 
 def keep_alive():
+	# print('Starting app...')
+	# app_thread = Thread(target=run_app)
+	# app_thread.start()
+	# print('App started.')
 	print('Starting bot...')
 	bot_thread = Thread(target=run_bot)
 	bot_thread.start()
 	print('Bot started.')
-	print('Starting app...')
-	app_thread = Thread(target=run_app)
-	app_thread.start()
-	print('App started.')
 
 
 def get_roles(ctx):
@@ -156,3 +156,4 @@ async def test(ctx):
 
 if __name__ == "__main__":
 	keep_alive()
+	run_app()
