@@ -1,21 +1,16 @@
-# from flask import Flask
-# from threading import Thread
-# import os
-# from dotenv import load_dotenv
+from flask import Flask
+from threading import Thread
+import os
 
-# load_dotenv()
+app = Flask(__name__)
 
-# app = Flask("")
+@app.route("/")
+def home():
+	return "Hello. I am alive!"
 
-# @app.route("/")
-# def home():
-#   return "Hello. I am alive!"
-
-# def run():
-#   port = int(os.getenv('PORT'))
-#   print(f'Listening on port {port}')
-#   app.run(host='0.0.0.0', port=port)
+def run():
+	app.run()
 
 # def keep_alive():
-#   t = Thread(target=run)
-#   t.start()
+# 	t = Thread(target=run)
+# 	t.start()

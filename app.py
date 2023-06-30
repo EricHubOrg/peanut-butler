@@ -135,12 +135,7 @@
 # keep_alive.keep_alive()
 # bot.run(os.environ['DISCORD_TOKEN'])
 
-from flask import Flask
-app = Flask(__name__)
-
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+import keep_alive
 
 if __name__ == '__main__':
-    app.run()
+    keep_alive.run()
