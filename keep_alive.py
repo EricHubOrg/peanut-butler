@@ -1,9 +1,9 @@
 from flask import Flask
 from threading import Thread
 import os
-import dotenv
+from dotenv import load_dotenv
 
-dotenv.load_dotenv()
+load_dotenv()
 
 app = Flask("")
 

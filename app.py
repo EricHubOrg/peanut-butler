@@ -2,10 +2,10 @@ from dotenv import load_dotenv
 import os
 # import base64
 
-from discord import Intents, DMChannel, utils
-from discord.ext import commands
+# from discord import Intents, DMChannel, utils
+# from discord.ext import commands
 
-from keep_alive import keep_alive
+import keep_alive
 
 # from google_api import get_credentials
 # from googleapiclient.discovery import build
@@ -49,19 +49,19 @@ load_dotenv()
 # 		return 0
 # 	return 1
 		
-intents = Intents.default()
-intents.message_content = True
+# intents = Intents.default()
+# intents.message_content = True
 
-bot = commands.Bot(
-	command_prefix='%',
-	description='Fidel majordom del Creador.\nExecuta `%help` per veure els comandaments disponibles.',
-	intents=intents,
-)
+# bot = commands.Bot(
+# 	command_prefix='%',
+# 	description='Fidel majordom del Creador.\nExecuta `%help` per veure els comandaments disponibles.',
+# 	intents=intents,
+# )
 
 
-@bot.event
-async def on_ready():
-	print(f'We have logged in as {bot.user}')
+# @bot.event
+# async def on_ready():
+# 	print(f'We have logged in as {bot.user}')
 
 # @bot.event
 # async def on_message(message):
@@ -78,9 +78,9 @@ async def on_ready():
 # 	await bot.process_commands(message)
 
 
-@bot.command()
-async def test(ctx):
-	await ctx.send('Hello there!')
+# @bot.command()
+# async def test(ctx):
+# 	await ctx.send('Hello there!')
 		
 # @bot.command()
 # async def gmail(ctx):
@@ -132,5 +132,5 @@ async def test(ctx):
 # 	except:
 # 		await ctx.send('An error occurred: unknown')
 
-keep_alive()
-bot.run(os.environ['DISCORD_TOKEN'])
+keep_alive.keep_alive()
+# bot.run(os.environ['DISCORD_TOKEN'])
