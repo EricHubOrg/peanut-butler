@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-import base64
+# import base64
 
 from discord import Intents, DMChannel, utils
 from discord.ext import commands
@@ -13,41 +13,41 @@ from keep_alive import keep_alive
 
 load_dotenv()
 
-def get_roles(ctx):
-	roles = ["simple mortal", "bots publics", "privilegiat", "alta taula", "CREADOR"]
-	return {name:utils.get(ctx.guild.roles, name=name) for name in roles}
+# def get_roles(ctx):
+# 	roles = ["simple mortal", "bots publics", "privilegiat", "alta taula", "CREADOR"]
+# 	return {name:utils.get(ctx.guild.roles, name=name) for name in roles}
 
-def get_deny_message(ctx):
-	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
-		return f'Ho sento {ctx.author.mention}, però no tens permís per fer això.'
-	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
-		return f'Ho sento Creador, però aquests temes només els tractem a l\'{bot.get_channel(int(os.environ["CHANNEL_ID_alta_taula"])).mention}'
-	else:
-		return None
+# def get_deny_message(ctx):
+# 	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
+# 		return f'Ho sento {ctx.author.mention}, però no tens permís per fer això.'
+# 	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
+# 		return f'Ho sento Creador, però aquests temes només els tractem a l\'{bot.get_channel(int(os.environ["CHANNEL_ID_alta_taula"])).mention}'
+# 	else:
+# 		return None
 
-def check_authority(ctx, level):
-	# level 0: >= simple mortal
-	# level 1: >= bots publics
-	# level 2: >= privilegiat
-	# level 3: >= alta taula
-	# level 4: == CREADOR
-	# level 5: == CREADOR (alta_taula or test_bots)
-	roles = get_roles(ctx)
-	author_role = ctx.author.top_role
+# def check_authority(ctx, level):
+# 	# level 0: >= simple mortal
+# 	# level 1: >= bots publics
+# 	# level 2: >= privilegiat
+# 	# level 3: >= alta taula
+# 	# level 4: == CREADOR
+# 	# level 5: == CREADOR (alta_taula or test_bots)
+# 	roles = get_roles(ctx)
+# 	author_role = ctx.author.top_role
 
-	if level == 0 and author_role < roles["simple mortal"]:
-		return 0
-	elif level == 1 and author_role < roles["bots publics"]:
-		return 0
-	elif level == 2 and author_role < roles["privilegiat"]:
-		return 0
-	elif level == 3 and author_role < roles["alta taula"]:
-		return 0
-	elif level == 4 and author_role != roles["CREADOR"]:
-		return 0
-	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
-		return 0
-	return 1
+# 	if level == 0 and author_role < roles["simple mortal"]:
+# 		return 0
+# 	elif level == 1 and author_role < roles["bots publics"]:
+# 		return 0
+# 	elif level == 2 and author_role < roles["privilegiat"]:
+# 		return 0
+# 	elif level == 3 and author_role < roles["alta taula"]:
+# 		return 0
+# 	elif level == 4 and author_role != roles["CREADOR"]:
+# 		return 0
+# 	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
+# 		return 0
+# 	return 1
 		
 intents = Intents.default()
 intents.message_content = True
@@ -63,19 +63,19 @@ bot = commands.Bot(
 async def on_ready():
 	print(f'We have logged in as {bot.user}')
 
-@bot.event
-async def on_message(message):
-	if message.author.bot:
-		# ignore messages from other bots
-		return
+# @bot.event
+# async def on_message(message):
+# 	if message.author.bot:
+# 		# ignore messages from other bots
+# 		return
 
-	if isinstance(message.channel, DMChannel) or message.guild is None:
-		# ignore private messages and messages outside of a server
-		await message.channel.send('Ho sento, però no pots conversar amb mi en privat.')
-		return
+# 	if isinstance(message.channel, DMChannel) or message.guild is None:
+# 		# ignore private messages and messages outside of a server
+# 		await message.channel.send('Ho sento, però no pots conversar amb mi en privat.')
+# 		return
 
-	# process messages in the server normally
-	await bot.process_commands(message)
+# 	# process messages in the server normally
+# 	await bot.process_commands(message)
 
 
 @bot.command()
