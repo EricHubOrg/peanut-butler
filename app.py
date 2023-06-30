@@ -1,10 +1,11 @@
 from dotenv import load_dotenv
 import os
+# import base64
 
 from discord import Intents, DMChannel, utils
 from discord.ext import commands
-from flask import Flask
-from threading import Thread
+# from flask import Flask
+# from threading import Thread
 
 # from google_api import get_credentials
 # from googleapiclient.discovery import build
@@ -12,27 +13,20 @@ from threading import Thread
 
 load_dotenv()
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
-@app.route("/")
-def home():
-	return "Hello. I am alive!"
+# @app.route("/")
+# def home():
+# 	return "Hello. I am alive!"
 
-def run_app():
-	app.run()
+# def run_app():
+# 	app.run()
 
-def run_bot():
-	bot.run(os.environ['DISCORD_TOKEN'])
-
-def keep_alive():
-	# print('Starting app...')
-	# app_thread = Thread(target=run_app)
-	# app_thread.start()
-	# print('App started.')
-	print('Starting bot...')
-	bot_thread = Thread(target=run_bot)
-	bot_thread.start()
-	print('Bot started.')
+# def keep_alive():
+# 	print('Starting app...')
+# 	app_thread = Thread(target=run_app)
+# 	app_thread.start()
+# 	print('App started.')
 
 
 def get_roles(ctx):
@@ -155,5 +149,5 @@ async def test(ctx):
 # 		await ctx.send('An error occurred: unknown')
 
 if __name__ == "__main__":
-	keep_alive()
-	run_app()
+	# keep_alive()
+	bot.run(os.environ['DISCORD_TOKEN'])
