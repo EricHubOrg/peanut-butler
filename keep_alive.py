@@ -8,7 +8,7 @@ def home():
   return "Hello. I am alive!"
 
 def run():
-  app.run()
+  app.run(port=8000)
 
 def keep_alive():
   t = Thread(target=run)
