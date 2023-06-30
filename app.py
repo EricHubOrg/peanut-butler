@@ -135,7 +135,22 @@
 # keep_alive.keep_alive()
 # bot.run(os.environ['DISCORD_TOKEN'])
 
-import keep_alive
+from flask import Flask
+from threading import Thread
+import os
 
-if __name__ == '__main__':
-    keep_alive.run()
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+	return "Hello. I am alive!"
+
+def run():
+	app.run()
+
+def keep_alive():
+	t = Thread(target=run)
+	t.start()
+
+if __name__ == "__main__":
+	keep_alive()
