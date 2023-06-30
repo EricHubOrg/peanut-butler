@@ -1,17 +1,17 @@
-from dotenv import load_dotenv
-import os
+# from dotenv import load_dotenv
+# import os
 # import base64
 
 # from discord import Intents, DMChannel, utils
 # from discord.ext import commands
 
-import keep_alive
+# import keep_alive
 
 # from google_api import get_credentials
 # from googleapiclient.discovery import build
 # from googleapiclient.errors import HttpError
 
-load_dotenv()
+# load_dotenv()
 
 # def get_roles(ctx):
 # 	roles = ["simple mortal", "bots publics", "privilegiat", "alta taula", "CREADOR"]
@@ -132,5 +132,15 @@ load_dotenv()
 # 	except:
 # 		await ctx.send('An error occurred: unknown')
 
-keep_alive.keep_alive()
+# keep_alive.keep_alive()
 # bot.run(os.environ['DISCORD_TOKEN'])
+
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
+if __name__ == '__main__':
+    app.run()
