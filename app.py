@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-import base64
 
 from discord import Intents, DMChannel, utils
 from discord.ext import commands
@@ -147,4 +146,6 @@ async def test(ctx):
 
 if __name__ == "__main__":
 	keep_alive()
+	print('Starting bot...')
 	bot.run(os.environ['DISCORD_TOKEN'])
+	print('Bot started.')
