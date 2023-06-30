@@ -18,12 +18,22 @@ app = Flask(__name__)
 def home():
 	return "Hello. I am alive!"
 
-def run():
+def run_app():
 	app.run()
 
+def run_bot():
+	bot.run(os.environ['DISCORD_TOKEN'])
+
 def keep_alive():
-	t = Thread(target=run)
-	t.start()
+	print('Starting bot...')
+	bot_thread = Thread(target=run_bot)
+	bot_thread.start()
+	print('Bot started.')
+	print('Starting app...')
+	app_thread = Thread(target=run_app)
+	app_thread.start()
+	print('App started.')
+
 
 def get_roles(ctx):
 	roles = ["simple mortal", "bots publics", "privilegiat", "alta taula", "CREADOR"]
@@ -146,6 +156,3 @@ async def test(ctx):
 
 if __name__ == "__main__":
 	keep_alive()
-	print('Starting bot...')
-	bot.run(os.environ['DISCORD_TOKEN'])
-	print('Bot started.')
