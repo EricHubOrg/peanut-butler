@@ -1,5 +1,9 @@
 from flask import Flask
 from threading import Thread
+import os
+import dotenv
+
+dotenv.load_dotenv()
 
 app = Flask("")
 
@@ -8,7 +12,8 @@ def home():
   return "Hello. I am alive!"
 
 def run():
-  app.run(port=8000)
+  port = int(os.environ.get('PORT', 8000))
+  app.run(port=port)
 
 def keep_alive():
   t = Thread(target=run)
