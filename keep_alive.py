@@ -12,8 +12,9 @@ def home():
   return "Hello. I am alive!"
 
 def run():
-  port = int(os.environ.get('PORT', 8000))
-  app.run(port=port)
+  port = int(os.getenv('PORT'))
+  print(f'Listening on port {port}')
+  app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
   t = Thread(target=run)
