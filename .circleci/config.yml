@@ -1,0 +1,35 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.9
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Azure CLI
+          command: |
+            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      - run:
+          name: Log in to Azure
+          command: |
+            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+      - run:
+          name: Delete Azure container instance
+          command: |
+            az container delete --name peanut-butler-container --resource-group peanut-butler-rg --yes || true
+      - run:
+          name: Build and push Docker image
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker build -t $DOCKERHUB_USERNAME/ericclopezz/peanut-butler:latest .
+            docker push $DOCKERHUB_USERNAME/ericclopezz/peanut-butler:latest
+      - run:
+          name: Create container instance
+          command: |
+            az container create --resource-group peanut-butler-rg --name peanut-butler-container --image $DOCKERHUB_USERNAME/ericclopezz/peanut-butler:latest --dns-name-label peanut-butler-container --ports 80
+workflows:
+  version: 2
+  build_and_push:
+    jobs:
+      - build
