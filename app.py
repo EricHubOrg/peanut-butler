@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 import os
 import base64
+import datetime
 
 from discord import Intents, DMChannel, utils
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from google_api import get_credentials
 from googleapiclient.discovery import build
@@ -46,7 +47,20 @@ def check_authority(ctx, level):
 	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
 		return 0
 	return 1
-		
+
+def get_greeting():
+	now = datetime.datetime.now()
+	current_hour = now.hour
+
+	if current_hour < 6:
+		return "Bona nit"
+	elif current_hour < 15:
+		return "Bon dia"
+	elif current_hour < 21:
+		return "Bona tarda"
+	else:
+		return "Bona nit"
+
 intents = Intents.default()
 intents.message_content = True
 
@@ -56,10 +70,12 @@ bot = commands.Bot(
 	intents=intents,
 )
 
+bot.enable_gmail_warnings = True
 
 @bot.event
 async def on_ready():
 	print(f'We have logged in as {bot.user}')
+	gmail.start()
 
 @bot.event
 async def on_message(message):
@@ -80,13 +96,11 @@ async def on_message(message):
 async def test(ctx):
 	await ctx.send('Hello there!')
 		
-@bot.command()
-async def gmail(ctx):
-	# check if the user has the authority to use this command
-	if not check_authority(ctx, 5):
-		await ctx.send(get_deny_message(ctx))
-		return
-	
+@tasks.loop(minutes=1.0)
+async def gmail():
+	channel = await bot.fetch_channel(int(os.environ['CHANNEL_ID_alta_taula']))
+	user = await bot.fetch_user(int(os.environ['DISCORD_USER_ID']))
+
 	try:
 		# call the Gmail API
 		service = build('gmail', 'v1', credentials=get_credentials())
@@ -94,10 +108,9 @@ async def gmail(ctx):
 		results = service.users().messages().list(userId='me', q='is:unread').execute()
 		messages = results.get('messages', [])
 
-		if not messages:
-			await ctx.send('No hi ha correus nous.')
-		else:
-			await ctx.send('Tens {} correus nous:'.format(len(messages)))
+		if messages:
+			plural = {"s" if len(messages) > 1 else ""}
+			await channel.send(f'{get_greeting()} {user.mention}, tens {len(messages)} correu{plural} nou{plural}:')
 			for message in messages:
 				msg = service.users().messages().get(userId='me', id=message['id']).execute()
 
@@ -120,16 +133,24 @@ async def gmail(ctx):
 					short_body = short_body[:-1]
 
 				# print the subject and body of the message
-				await ctx.send(f':envelope: **{subject}**\n{short_body}{"..." if len(body) > limit else ""}')
+				await channel.send(f':envelope: **{subject}**\n{short_body}{"..." if len(body) > len(short_body) else ""}')
 
 				# mark the message as read
 				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
+		bot.enable_gmail_warnings = True
 
 	except HttpError as error:
-		await ctx.send(f'An error occurred: {error}')
+		if bot.enable_gmail_warnings:
+			bot.enable_gmail_warnings = False
+			await channel.send(f'Disculpa {user.mention}, hi ha hagut un error al llegir els correus de gmail: *{error}*. Pots veure l\'error en els logs: https://portal.azure.com/#@eines.uab.es/resource/subscriptions/117399c8-1bd2-4f8a-815b-fccc37d69ff0/resourceGroups/peanut-butler-rg/providers/Microsoft.App/containerapps/peanut-butler-capp/logstream')
 	except:
-		await ctx.send('An error occurred: unknown')
+		if bot.enable_gmail_warnings:
+			bot.enable_gmail_warnings = False
+			await channel.send(f'Disculpa {user.mention}, hi ha hagut algun error al llegir els correus de gmail. Pots veure l\'error en els logs: https://portal.azure.com/#@eines.uab.es/resource/subscriptions/117399c8-1bd2-4f8a-815b-fccc37d69ff0/resourceGroups/peanut-butler-rg/providers/Microsoft.App/containerapps/peanut-butler-capp/logstream')
+
+@gmail.before_loop
+async def before_gmail():
+	await bot.wait_until_ready()
 
 if __name__ == "__main__":
-	# keep_alive()
 	bot.run(os.environ['DISCORD_TOKEN'])
