@@ -25,5 +25,5 @@ def get_credentials():
 		# save the credentials for the next run
 		with open('token.json', 'w') as token:
 			token.write(creds.to_json())
-			
+	
 	return creds

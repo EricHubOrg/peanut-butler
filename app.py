@@ -70,7 +70,7 @@ bot = commands.Bot(
 	intents=intents,
 )
 
-bot.enable_gmail_warnings = True
+bot.warning_state = 0
 
 @bot.event
 async def on_ready():
@@ -109,8 +109,7 @@ async def gmail():
 		messages = results.get('messages', [])
 
 		if messages:
-			plural = {"s" if len(messages) > 1 else ""}
-			await channel.send(f'{get_greeting()} {user.mention}, tens {len(messages)} correu{plural} nou{plural}:')
+			await channel.send(f'{get_greeting()} {user.mention}, tens {len(messages)} correu'+'s'*(len(messages) > 1) + ' nou'+'s'*(len(messages) > 1) + ':')
 			for message in messages:
 				msg = service.users().messages().get(userId='me', id=message['id']).execute()
 
@@ -137,16 +136,27 @@ async def gmail():
 
 				# mark the message as read
 				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
-		bot.enable_gmail_warnings = True
+		bot.warning_state = True
 
 	except HttpError as error:
-		if bot.enable_gmail_warnings:
-			bot.enable_gmail_warnings = False
-			await channel.send(f'Disculpa {user.mention}, hi ha hagut un error al llegir els correus de gmail: *{error}*. Pots veure l\'error en els logs: https://portal.azure.com/#@eines.uab.es/resource/subscriptions/117399c8-1bd2-4f8a-815b-fccc37d69ff0/resourceGroups/peanut-butler-rg/providers/Microsoft.App/containerapps/peanut-butler-capp/logstream')
+		if bot.warning_state == 0:
+			bot.warning_state = 1
+			await channel.send(f'Disculpa {user.mention}, hi ha hagut un error al llegir els correus de gmail: *{error}*.\nIntentaré arreglar-ho...')
+			os.remove('token.json')
+			gmail.restart()
+		elif bot.warning_state == 1:
+			bot.warning_state = 2
+			await channel.send(f'Ho sento {user.mention}, no he pogut arreglar-ho.')
+
 	except:
-		if bot.enable_gmail_warnings:
-			bot.enable_gmail_warnings = False
-			await channel.send(f'Disculpa {user.mention}, hi ha hagut algun error al llegir els correus de gmail. Pots veure l\'error en els logs: https://portal.azure.com/#@eines.uab.es/resource/subscriptions/117399c8-1bd2-4f8a-815b-fccc37d69ff0/resourceGroups/peanut-butler-rg/providers/Microsoft.App/containerapps/peanut-butler-capp/logstream')
+		if bot.warning_state == 0:
+			bot.warning_state = 1
+			await channel.send(f'Disculpa {user.mention}, hi ha hagut algun error al llegir els correus de gmail.\nIntentaré arreglar-ho...')
+			os.remove('token.json')
+			gmail.restart()
+		elif bot.warning_state == 1:
+			bot.warning_state = 2
+			await channel.send(f'Ho sento {user.mention}, no he pogut arreglar-ho.')
 
 @gmail.before_loop
 async def before_gmail():
