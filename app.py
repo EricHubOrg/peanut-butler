@@ -76,6 +76,7 @@ bot.warning_state = 0
 async def on_ready():
 	print(f'We have logged in as {bot.user}')
 	gmail.start()
+	keep_alive.start()
 
 @bot.event
 async def on_message(message):
@@ -161,6 +162,14 @@ async def gmail():
 @gmail.before_loop
 async def before_gmail():
 	await bot.wait_until_ready()
+
+@tasks.loop(minutes=1.0)
+async def keep_alive():
+    print(f'Keep alive task run at {datetime.datetime.utcnow()}')
+
+@keep_alive.before_loop
+async def before_keep_alive():
+    await bot.wait_until_ready()
 
 if __name__ == "__main__":
 	bot.run(os.environ['DISCORD_TOKEN'])
