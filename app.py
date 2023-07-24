@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import base64
 import datetime
+import logging
 
 from discord import Intents, DMChannel, utils
 from discord.ext import commands, tasks
@@ -72,9 +73,12 @@ bot = commands.Bot(
 
 bot.warning_state = 0
 
+logging.basicConfig(level=logging.INFO)
+
 @bot.event
 async def on_ready():
 	print(f'We have logged in as {bot.user}')
+	logging.info(f'We have logged in as {bot.user}')
 	gmail.start()
 	keep_alive.start()
 
@@ -96,9 +100,13 @@ async def on_message(message):
 @bot.command()
 async def test(ctx):
 	await ctx.send('Hello there!')
+	print(f'test at {datetime.datetime.utcnow()}')
+	logging.info(f'test at {datetime.datetime.utcnow()}')
 		
 @tasks.loop(minutes=1.0)
 async def gmail():
+	print(f'Gmail task run at {datetime.datetime.utcnow()}')
+	logging.info(f'Gmail task run at {datetime.datetime.utcnow()}')
 	channel = await bot.fetch_channel(int(os.environ['CHANNEL_ID_alta_taula']))
 	user = await bot.fetch_user(int(os.environ['DISCORD_USER_ID']))
 
@@ -166,6 +174,7 @@ async def before_gmail():
 @tasks.loop(minutes=1.0)
 async def keep_alive():
     print(f'Keep alive task run at {datetime.datetime.utcnow()}')
+    logging.info(f'Keep alive task run at {datetime.datetime.utcnow()}')
 
 @keep_alive.before_loop
 async def before_keep_alive():
