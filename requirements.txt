@@ -5,3 +5,4 @@ google-api-core==2.11.1
 google-auth==2.18.1
 google-auth-oauthlib==1.0.0
 transformers==4.30.2
+torch==2.0.1
