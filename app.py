@@ -11,6 +11,8 @@ from google_api import get_credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import llama
+
 load_dotenv()
 
 def get_roles(ctx):
@@ -93,7 +95,18 @@ async def on_message(message):
 		await message.channel.send('Ho sento, però no pots conversar amb mi en privat.')
 		return
 
-	# process messages in the server normally
+	if message.content.startswith('\\'):
+		# gererate answer with llama model
+		await message.channel.send('Generant resposta...')
+		try:
+			prompt = message.content[1:]
+			response = llama.generate(prompt)
+			await message.channel.send(response)
+		except:
+			await message.channel.send('Ho sento, però algo ha fallat.')
+		return
+
+	# process commands normally
 	await bot.process_commands(message)
 
 
