@@ -4,6 +4,10 @@ import os, logging
 logging.basicConfig(level=logging.INFO)
 
 dir_path = "llama2"
+
+logging.info(f"Current directory: {os.getcwd()}")
+logging.info(f"Files and directories in current directory: {os.listdir()}")
+
 if os.path.exists(dir_path) and os.path.isdir(dir_path):
 	logging.info(f"Loading model from {dir_path}")
 	tokenizer = AutoTokenizer.from_pretrained(dir_path)
