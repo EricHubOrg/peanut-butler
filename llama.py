@@ -1,7 +1,13 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import os, logging
 
-tokenizer = AutoTokenizer.from_pretrained("llama2")
-model = AutoModelForCausalLM.from_pretrained("llama2")
+logging.basicConfig(level=logging.INFO)
+
+dir_path = "llama2"
+if os.path.exists(dir_path) and os.path.isdir(dir_path):
+	logging.info(f"Loading model from {dir_path}")
+	tokenizer = AutoTokenizer.from_pretrained(dir_path)
+	model = AutoModelForCausalLM.from_pretrained(dir_path)
 
 def generate(prompt, max_length=50):
 	inputs = tokenizer(prompt, return_tensors="pt")

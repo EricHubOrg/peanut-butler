@@ -102,6 +102,8 @@ async def on_message(message):
 			prompt = message.content[1:]
 			response = llama.generate(prompt)
 			await message.channel.send(response)
+		except NameError:
+			await message.channel.send('Ho sento, El model no ha pogut ser carregat.')
 		except:
 			await message.channel.send('Ho sento, però algo ha fallat.')
 		return
