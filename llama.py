@@ -3,10 +3,10 @@ import os, logging
 
 logging.basicConfig(level=logging.INFO)
 
-dir_path = "/data/llama2"
+dir_path = "/data/data/llama2"
 
 logging.info(f"Files and directories in root directory: {os.listdir('/')}")
-logging.info(f"Files and directories in /data directory: {os.listdir('/data')}")
+logging.info(f"Files and directories in /data/data directory: {os.listdir('/data/data')}")
 
 if os.path.exists(dir_path) and os.path.isdir(dir_path):
 	logging.info(f"Loading model from {dir_path}")
