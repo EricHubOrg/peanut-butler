@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-tokenizer = AutoTokenizer.from_pretrained("/llama2")
-model = AutoModelForCausalLM.from_pretrained("/llama2")
+tokenizer = AutoTokenizer.from_pretrained("llama2")
+model = AutoModelForCausalLM.from_pretrained("llama2")
 
 def generate(prompt, max_length=50):
 	inputs = tokenizer(prompt, return_tensors="pt")
