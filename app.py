@@ -104,8 +104,8 @@ async def on_message(message):
 			await message.channel.send(response)
 		except NameError:
 			await message.channel.send('Ho sento, El model no ha pogut ser carregat.')
-		except:
-			await message.channel.send('Ho sento, però algo ha fallat.')
+		except Exception as e:
+			await message.channel.send(f'Ho sento, però algo ha fallat: {e}')
 		return
 
 	# process commands normally
