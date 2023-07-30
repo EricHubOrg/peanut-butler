@@ -79,7 +79,6 @@ logging.basicConfig(level=logging.INFO)
 
 @bot.event
 async def on_ready():
-	print(f'We have logged in as {bot.user}')
 	logging.info(f'We have logged in as {bot.user}')
 	gmail.start()
 	keep_alive.start()
@@ -99,13 +98,13 @@ async def on_message(message):
 		# gererate answer with llama model
 		await message.channel.send('Generant resposta...')
 		try:
-			prompt = message.content[1:]
+			prompt = message.content[1:] # ignore the first character (\)
 			response = llama.generate(prompt)
 			await message.channel.send(response)
-		except NameError:
-			await message.channel.send('Ho sento, El model no ha pogut ser carregat.')
-		except Exception as e:
-			await message.channel.send(f'Ho sento, però algo ha fallat: {e}')
+			logging.info('Response sended successfully')
+		except:
+			await message.channel.send('Ho sento, però algo ha fallat')
+			logging.info('Response failed to send')
 		return
 
 	# process commands normally
@@ -114,14 +113,12 @@ async def on_message(message):
 
 @bot.command()
 async def test(ctx):
-	await ctx.send('Hello there!')
-	print(f'test at {datetime.datetime.utcnow()}')
 	logging.info(f'test at {datetime.datetime.utcnow()}')
+	await ctx.send('Hello there!')
 		
 @tasks.loop(minutes=1.0)
 async def gmail():
-	print(f'Gmail task run at {datetime.datetime.utcnow()}')
-	logging.info(f'Gmail task run at {datetime.datetime.utcnow()}')
+	logging.info('Checking gmail...')
 	channel = await bot.fetch_channel(int(os.environ['CHANNEL_ID_alta_taula']))
 	user = await bot.fetch_user(int(os.environ['DISCORD_USER_ID']))
 
@@ -129,11 +126,13 @@ async def gmail():
 		# call the Gmail API
 		service = build('gmail', 'v1', credentials=get_credentials())
 		# list all unread emails
+		logging.info('Reading emails...')
 		results = service.users().messages().list(userId='me', q='is:unread').execute()
 		messages = results.get('messages', [])
 
 		if messages:
 			await channel.send(f'{get_greeting()} {user.mention}, tens {len(messages)} correu'+'s'*(len(messages) > 1) + ' nou'+'s'*(len(messages) > 1) + ':')
+			logging.info('Processing emails...')
 			for message in messages:
 				msg = service.users().messages().get(userId='me', id=message['id']).execute()
 
@@ -155,32 +154,30 @@ async def gmail():
 				if short_body[-1] == '\n':
 					short_body = short_body[:-1]
 
-				# print the subject and body of the message
+				# send the subject and body of the message
+				logging.info('Sending email content...')
 				await channel.send(f':envelope: **{subject}**\n{short_body}{"..." if len(body) > len(short_body) else ""}')
 
 				# mark the message as read
+				logging.info('Marking email as read...')
 				service.users().messages().modify(userId='me', id=message['id'], body={'removeLabelIds': ['UNREAD']}).execute()
 		bot.warning_state = True
-
-	except HttpError as error:
-		if bot.warning_state == 0:
-			bot.warning_state = 1
-			await channel.send(f'Disculpa {user.mention}, hi ha hagut un error al llegir els correus de gmail: *{error}*.\nIntentaré arreglar-ho...')
-			os.remove('token.json')
-			gmail.restart()
-		elif bot.warning_state == 1:
-			bot.warning_state = 2
-			await channel.send(f'Ho sento {user.mention}, no he pogut arreglar-ho.')
-
-	except:
+	except Exception as e:
+		logging.error(e)
 		if bot.warning_state == 0:
 			bot.warning_state = 1
 			await channel.send(f'Disculpa {user.mention}, hi ha hagut algun error al llegir els correus de gmail.\nIntentaré arreglar-ho...')
 			os.remove('token.json')
+			logging.info('Gmail token removed. Restarting gmail check...')
 			gmail.restart()
 		elif bot.warning_state == 1:
 			bot.warning_state = 2
-			await channel.send(f'Ho sento {user.mention}, no he pogut arreglar-ho.')
+			await channel.send(f'Ho sento, no he pogut arreglar-ho.')
+			logging.info('Gmail check failed. Checks will still be made every minute')
+		elif bot.warning_state == 2:
+			logging.info('Gmail check failed.')
+	else:
+		logging.info('Gmail checked successfully')
 
 @gmail.before_loop
 async def before_gmail():
@@ -188,8 +185,7 @@ async def before_gmail():
 
 @tasks.loop(minutes=1.0)
 async def keep_alive():
-    print(f'Keep alive task run at {datetime.datetime.utcnow()}')
-    logging.info(f'Keep alive task run at {datetime.datetime.utcnow()}')
+    logging.info(f'Life signal at {datetime.datetime.utcnow()}')
 
 @keep_alive.before_loop
 async def before_keep_alive():

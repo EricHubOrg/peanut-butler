@@ -3,6 +3,4 @@ test.py
 test2.py
 personality.txt
 __pycache__
-bot_data.json
-credentials.json
-token.json
+*.json
