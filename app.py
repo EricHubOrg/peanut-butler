@@ -9,7 +9,6 @@ from discord.ext import commands, tasks
 
 from google_api import get_credentials
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 import llama
 
@@ -80,8 +79,8 @@ logging.basicConfig(level=logging.INFO)
 @bot.event
 async def on_ready():
 	logging.info(f'We have logged in as {bot.user}')
-	gmail.start()
 	keep_alive.start()
+	gmail.start()
 
 @bot.event
 async def on_message(message):

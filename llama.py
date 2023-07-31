@@ -3,7 +3,7 @@ import os, logging, json
 
 logging.basicConfig(level=logging.INFO)
 
-dir_path = '/data/llama-2-13b-chat'
+dir_path = '/data/llama-2-7b-chat'
 
 if os.path.exists(dir_path) and os.path.isdir(dir_path):
 	logging.info(f'Loading model from {dir_path}')
@@ -27,7 +27,7 @@ def generate(prompt):
 	logging.info('Tokenizing prompt...')
 	inputs = tokenizer(prompt, return_tensors='pt')
 	logging.info('Generating response...')
-	outputs = model.generate(**inputs, **generation_config)
+	outputs = model.generate(**inputs, **generation_config)[inputs.input_ids.shape[-1]:]
 	logging.info('Decoding response...')
 	decoded_output = tokenizer.decode(outputs[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
 	logging.info('Sending response...')
