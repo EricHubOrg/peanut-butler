@@ -4,3 +4,4 @@ test2.py
 personality.txt
 __pycache__
 *.json
+chatbot_local.py

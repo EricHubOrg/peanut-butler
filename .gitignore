@@ -8,3 +8,4 @@ __pycache__
 personality.txt
 test.py
 test2.py
+chatbot_local.py

@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import datetime
-import os, base64, logging, asyncio
+import os, base64, logging, asyncio, json
 
 from discord import Intents, DMChannel, utils
 from discord.ext import commands, tasks
@@ -13,14 +13,14 @@ import chatbot
 load_dotenv()
 
 def get_roles(ctx):
-	roles = ["simple mortal", "bots publics", "privilegiat", "alta taula", "CREADOR"]
+	roles = ['simple mortal', 'bots publics', 'privilegiat', 'alta taula', 'CREADOR']
 	return {name:utils.get(ctx.guild.roles, name=name) for name in roles}
 
 def get_deny_message(ctx):
 	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
 		return f'Ho sento {ctx.author.mention}, però no tens permís per fer això.'
 	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
-		return f'Ho sento Creador, però aquests temes només els tractem a l\'{bot.get_channel(int(os.environ["CHANNEL_ID_alta_taula"])).mention}'
+		return f"Ho sento Creador, però aquests temes només els tractem a l'{bot.get_channel(int(os.environ['CHANNEL_ID_alta_taula'])).mention}"
 	else:
 		return None
 
@@ -34,17 +34,17 @@ def check_authority(ctx, level):
 	roles = get_roles(ctx)
 	author_role = ctx.author.top_role
 
-	if level == 0 and author_role < roles["simple mortal"]:
+	if level == 0 and author_role < roles['simple mortal']:
 		return 0
-	elif level == 1 and author_role < roles["bots publics"]:
+	elif level == 1 and author_role < roles['bots publics']:
 		return 0
-	elif level == 2 and author_role < roles["privilegiat"]:
+	elif level == 2 and author_role < roles['privilegiat']:
 		return 0
-	elif level == 3 and author_role < roles["alta taula"]:
+	elif level == 3 and author_role < roles['alta taula']:
 		return 0
-	elif level == 4 and author_role != roles["CREADOR"]:
+	elif level == 4 and author_role != roles['CREADOR']:
 		return 0
-	elif level == 5 and author_role != roles["CREADOR"] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
+	elif level == 5 and author_role != roles['CREADOR'] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
 		return 0
 	return 1
 
@@ -53,13 +53,31 @@ def get_greeting():
 	current_hour = now.hour
 
 	if current_hour < 6:
-		return "Bona nit"
+		return 'Bona nit'
 	elif current_hour < 15:
-		return "Bon dia"
+		return 'Bon dia'
 	elif current_hour < 21:
-		return "Bona tarda"
+		return 'Bona tarda'
 	else:
-		return "Bona nit"
+		return 'Bona nit'
+	
+def _read_from_file_sync(filename):
+	with open(filename, 'r') as f:
+		return f.read()
+
+async def read_from_file(filename):
+	loop = asyncio.get_event_loop()
+	content = await loop.run_in_executor(None, _read_from_file_sync, filename)
+	return content
+
+def _write_to_file_sync(filename, content):
+	with open(filename, 'w') as f:
+		f.write(content)
+
+async def write_to_file(filename, content):
+	loop = asyncio.get_event_loop()
+	await loop.run_in_executor(None, _write_to_file_sync, filename, content)
+
 
 intents = Intents.default()
 intents.message_content = True
@@ -70,7 +88,9 @@ bot = commands.Bot(
 	intents=intents,
 )
 
-bot.warning_state = 0
+with open('/data/bot_data/bot_data.json', 'r') as f:
+	bot.data = json.load(f)
+	bot.warning_state = 0
 
 logging.basicConfig(level=logging.INFO)
 
@@ -96,11 +116,16 @@ async def on_message(message):
 		async with message.channel.typing():
 			try:
 				prompt = message.content[1:] # ignore the first character (\)
-				loop = asyncio.get_event_loop()
-				response = await loop.run_in_executor(None, chatbot.generate, prompt)
+				response, conversation = await chatbot.generate(prompt, bot.data['conversation'], os.environ['CHATBOT_API_URL'], os.environ['CHATBOT_API_KEY'])
 				if response is not None:
+					logging.info('Response generated successfully. Updating bot conversation...')
+					conversation_limit = json.loads(await read_from_file('/data/bot_data/bot_data.json'))['conversation_limit']
+					conversation['past_user_inputs'] = conversation['past_user_inputs'][-conversation_limit:]
+					conversation['generated_responses'] = conversation['generated_responses'][-conversation_limit:]
+					bot.data['conversation'] = conversation
+					await write_to_file('/data/bot_data/bot_data.json', json.dumps(bot.data))
+					logging.info('Conversation updated')
 					await message.channel.send(response)
-					logging.info('Response sended successfully')
 				else:
 					raise Exception('Response was None')
 			except Exception as e:
@@ -187,11 +212,11 @@ async def before_gmail():
 
 @tasks.loop(minutes=1.0)
 async def keep_alive():
-    logging.info(f'Life signal at {datetime.datetime.utcnow()}')
+	logging.info(f'Life signal at {datetime.datetime.utcnow()}')
 
 @keep_alive.before_loop
 async def before_keep_alive():
-    await bot.wait_until_ready()
+	await bot.wait_until_ready()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	bot.run(os.environ['DISCORD_TOKEN'])

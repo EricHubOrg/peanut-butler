@@ -1,34 +1,23 @@
-from transformers import BlenderbotTokenizer, BlenderbotForConditionalGeneration
-import os, logging, json
+import json, logging, aiohttp
 
 logging.basicConfig(level=logging.INFO)
 
-dir_path = '/data/blenderbot-3b'
+async def generate(prompt, conversation, api_url, api_key):
+	input_data = {'inputs': {'text':prompt, 'past_user_inputs':conversation['past_user_inputs'], 'generated_responses':conversation['generated_responses']}}
 
-if os.path.exists(dir_path) and os.path.isdir(dir_path):
-	logging.info(f'Loading model from {dir_path}')
-	try:
-		tokenizer = BlenderbotTokenizer.from_pretrained(dir_path)
-		model = BlenderbotForConditionalGeneration.from_pretrained(dir_path)
-		logging.info(f'Model loaded correctly. Size: {model.get_memory_footprint()}')
-	except Exception as e:
-		logging.info(f'Error loading model: {e}')
-else:
-	logging.info(f"Path {dir_path} doesn't exist in the root directory. Model couldn't be loaded")
+	if not api_key:
+		raise Exception('A key should be provided to invoke the endpoint')
 
-def generate(prompt):
-	logging.info(f'Loading generation config from {dir_path}/generation_config.json')
-	try:
-		with open(dir_path+'/generation_config.json') as f:
-			generation_config = json.load(f)
-		logging.info('Generation config loaded correctly')
-	except Exception as e:
-		logging.info(f'Error loading generation config: {e}')
-	logging.info('Tokenizing prompt...')
-	inputs = tokenizer(prompt, return_tensors='pt')
-	logging.info('Generating response...')
-	outputs = model.generate(**inputs, **generation_config)#[:, inputs.input_ids.shape[-1]:]
-	logging.info('Decoding response...')
-	decoded_output = tokenizer.decode(outputs[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
-	logging.info('Sending response...')
-	return decoded_output
+	headers = {'Content-Type':'application/json', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'facebook-blenderbot-3b' }
+
+	logging.info('Sending request to endpoint, waiting for response...')
+	async with aiohttp.ClientSession() as session:
+		async with session.post(api_url, data=json.dumps(input_data), headers=headers) as response:
+			if response.status != 200:
+				logging.info(f'The request failed with status code: {response.status}')
+				logging.info(await response.text())
+				return None, None
+
+			result = await response.json()
+			logging.info('Response received. Sending...')
+			return result['generated_text'], result['conversation']
