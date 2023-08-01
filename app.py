@@ -1,8 +1,6 @@
 from dotenv import load_dotenv
-import os
-import base64
 import datetime
-import logging
+import os, base64, logging, asyncio
 
 from discord import Intents, DMChannel, utils
 from discord.ext import commands, tasks
@@ -10,7 +8,7 @@ from discord.ext import commands, tasks
 from google_api import get_credentials
 from googleapiclient.discovery import build
 
-import llama
+import chatbot
 
 load_dotenv()
 
@@ -94,16 +92,20 @@ async def on_message(message):
 		return
 
 	if message.content.startswith('\\'):
-		# gererate answer with llama model
-		await message.channel.send('Generant resposta...')
-		try:
-			prompt = message.content[1:] # ignore the first character (\)
-			response = llama.generate(prompt)
-			await message.channel.send(response)
-			logging.info('Response sended successfully')
-		except:
-			await message.channel.send('Ho sento, però algo ha fallat')
-			logging.info('Response failed to send')
+		# gererate answer with LLM model
+		async with message.channel.typing():
+			try:
+				prompt = message.content[1:] # ignore the first character (\)
+				loop = asyncio.get_event_loop()
+				response = await loop.run_in_executor(None, chatbot.generate, prompt)
+				if response is not None:
+					await message.channel.send(response)
+					logging.info('Response sended successfully')
+				else:
+					raise Exception('Response was None')
+			except Exception as e:
+				await message.channel.send('Ho sento, però algo ha fallat')
+				logging.info(f'Response failed to send: {e}')
 		return
 
 	# process commands normally
@@ -141,6 +143,7 @@ async def gmail():
 				for d in headers:
 					if d['name'] == 'Subject':
 						subject = d['value']
+						break
 				if 'parts' in payload:
 					body = payload['parts'][0]['body']['data']
 				else:
