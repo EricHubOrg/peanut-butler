@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import datetime
 import os, base64, logging, asyncio, json
 
+import discord
 from discord import Intents, DMChannel, utils, Embed
 from discord.ext import commands, tasks
 
@@ -88,7 +89,7 @@ bot = commands.Bot(
 	intents=intents,
 )
 
-with open('/data/bot_data/bot_data.json', 'r') as f:
+with open('data/bot_data/bot_data.json', 'r') as f:
 	bot.data = json.load(f)
 	bot.warning_state = 0
 
@@ -106,19 +107,23 @@ bot.remove_command('help')
 async def help(ctx, arg0=None):
 	if arg0:
 		# Give info about the command
-		arg0 = ' '.join(arg0) # Joining input in case it's a command with a space
-		if command := bot.get_command(arg0):
-			# If the command is found, send a help message
-			await ctx.send(f'**{command.name}**\n{command.description}\nUsage: `{command.usage}`')
+		command = bot.get_command(arg0)
+		if command:
+			embed = Embed(title=command.name, description=command.description, color=int(bot.data['embed_color'], 16))
+			embed.add_field(name='us', value=f'`{command.usage}`')
+			await ctx.send(embed=embed)
 		else:
 			await ctx.send(f'No existeix cap comandament que es digui "{arg0}"')
 	else:
 		# List all commands
-		embed = Embed(title="Peanut Butler", description=bot.description, color=0x3aa1c2)
+		file = discord.File("data/bot_data/peanut_butler.png", filename="peanut_butler.png")
+		embed = Embed(title="Peanut Butler", description=bot.description, color=int(bot.data['embed_color'], 16))
+		embed.set_thumbnail(url='attachment://peanut_butler.png')
+		embed.set_author(name='Eric Lopez', url='https://github.com/Pikurrot', icon_url='https://avatars.githubusercontent.com/u/90217719?v=4')
 		for command in sorted(bot.commands, key=lambda command: command.name):
 			if command.name != 'help':
 				embed.add_field(name=command.name, value=command.brief, inline=False)
-		await ctx.send(embed=embed)
+		await ctx.send(embed=embed, file=file)
 
 @bot.event
 async def on_ready():
