@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import datetime
 import os, base64, logging, asyncio, json
 
-from discord import Intents, DMChannel, utils
+from discord import Intents, DMChannel, utils, Embed
 from discord.ext import commands, tasks
 
 from google_api import get_credentials
@@ -94,11 +94,37 @@ with open('/data/bot_data/bot_data.json', 'r') as f:
 
 logging.basicConfig(level=logging.INFO)
 
+# Remove the default help command
+bot.remove_command('help')
+
+# Create a new help command
+@bot.command(
+	brief='Mostra aquest missatge.',
+	description='Mostra informació sobre els comandaments disponibles.',
+	usage='%help [comandament]'
+)
+async def help(ctx, arg0=None):
+	if arg0:
+		# Give info about the command
+		arg0 = ' '.join(arg0) # Joining input in case it's a command with a space
+		if command := bot.get_command(arg0):
+			# If the command is found, send a help message
+			await ctx.send(f'**{command.name}**\n{command.description}\nUsage: `{command.usage}`')
+		else:
+			await ctx.send(f'No existeix cap comandament que es digui "{arg0}"')
+	else:
+		# List all commands
+		embed = Embed(title="Peanut Butler", description=bot.description, color=0x3aa1c2)
+		for command in sorted(bot.commands, key=lambda command: command.name):
+			if command.name != 'help':
+				embed.add_field(name=command.name, value=command.brief, inline=False)
+		await ctx.send(embed=embed)
+
 @bot.event
 async def on_ready():
 	logging.info(f'We have logged in as {bot.user}')
 	keep_alive.start()
-	gmail.start()
+	# gmail.start()
 
 @bot.event
 async def on_message(message):
@@ -137,10 +163,13 @@ async def on_message(message):
 	await bot.process_commands(message)
 
 
-@bot.command()
-async def test(ctx):
+@bot.command(
+		brief='Breu descripció del commandament `test`.',
+		description='Descripció més llarga del commandament `test`.',
+		usage='%test [arg0] (arg1)')
+async def test(ctx, arg0, arg1=0):
 	logging.info(f'test at {datetime.datetime.utcnow()}')
-	await ctx.send('Hello there!')
+	await ctx.send(f'Hello there! {arg0} + {arg1} = {int(arg0) + int(arg1)}')
 		
 @tasks.loop(minutes=1.0)
 async def gmail():

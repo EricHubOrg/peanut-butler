@@ -1,11 +1,8 @@
-.config
-venv
-.replit
-replit.nix
 .env
-__pycache__
-*.json
-personality.txt
 test.py
 test2.py
+personality.txt
+__pycache__
+*.json
 chatbot_local.py
+data
