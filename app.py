@@ -6,7 +6,7 @@ import discord
 from discord import Intents, DMChannel, utils, Embed
 from discord.ext import commands, tasks
 
-from google_api import get_credentials
+from google_api import _get_credentials_sync
 from googleapiclient.discovery import build
 
 import chatbot
@@ -88,6 +88,10 @@ def _write_to_file_sync(filename, content):
 async def write_to_file(filename, content):
 	loop = asyncio.get_event_loop()
 	await loop.run_in_executor(None, _write_to_file_sync, filename, content)
+
+async def get_credentials():
+	credentials = await _get_credentials_sync()
+	return credentials
 
 
 intents = Intents.default()
@@ -193,7 +197,7 @@ async def gmail():
 
 	try:
 		# call the Gmail API
-		service = build('gmail', 'v1', credentials=get_credentials())
+		service = build('gmail', 'v1', credentials=await get_credentials())
 		# list all unread emails
 		logging.info('Reading emails...')
 		results = service.users().messages().list(userId='me', q='is:unread').execute()

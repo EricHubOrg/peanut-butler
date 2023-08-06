@@ -8,7 +8,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 # if modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 
-def get_credentials():
+def _get_credentials_sync():
 	creds = None
 	# the file token.json stores the user's access and refresh tokens, and is
 	# created automatically when the authorization flow completes for the first
