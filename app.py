@@ -13,27 +13,36 @@ import chatbot
 
 load_dotenv()
 
-def get_roles(ctx):
+def get_roles(ctx=None, guild=None):
+	if ctx:
+		guild = ctx.guild
 	roles = ['simple mortal', 'bots publics', 'privilegiat', 'alta taula', 'CREADOR']
-	return {name:utils.get(ctx.guild.roles, name=name) for name in roles}
+	return {name:utils.get(guild.roles, name=name) for name in roles}
 
-def get_deny_message(ctx):
-	if ctx.author.id != int(os.environ['DISCORD_USER_ID']):
-		return f'Ho sento {ctx.author.mention}, però no tens permís per fer això.'
-	elif ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
+def get_deny_message(ctx=None, author=None, channel=None):
+	if ctx:
+		author = ctx.author
+		channel = ctx.channel
+	if author.id != int(os.environ['DISCORD_USER_ID']):
+		return f'Ho sento {author.mention}, però no tens permís per fer això.'
+	elif channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
 		return f"Ho sento Creador, però aquests temes només els tractem a l'{bot.get_channel(int(os.environ['CHANNEL_ID_alta_taula'])).mention}"
 	else:
 		return None
 
-def check_authority(ctx, level):
+def check_authority(level, ctx=None, author=None, guild=None, channel=None):
 	# level 0: >= simple mortal
 	# level 1: >= bots publics
 	# level 2: >= privilegiat
 	# level 3: >= alta taula
 	# level 4: == CREADOR
 	# level 5: == CREADOR (alta_taula or test_bots)
-	roles = get_roles(ctx)
-	author_role = ctx.author.top_role
+	if ctx:
+		author = ctx.author
+		guild = ctx.guild
+		channel = ctx.channel
+	roles = get_roles(guild=guild)
+	author_role = author.top_role
 
 	if level == 0 and author_role < roles['simple mortal']:
 		return 0
@@ -45,7 +54,7 @@ def check_authority(ctx, level):
 		return 0
 	elif level == 4 and author_role != roles['CREADOR']:
 		return 0
-	elif level == 5 and author_role != roles['CREADOR'] or ctx.channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
+	elif level == 5 and author_role != roles['CREADOR'] or channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
 		return 0
 	return 1
 
@@ -171,11 +180,12 @@ async def on_message(message):
 @bot.command(
 		brief='Breu descripció del commandament `test`.',
 		description='Descripció més llarga del commandament `test`.',
-		usage='%test [arg0] (arg1)')
+		usage='%test [arg0] (arg1)'
+)
 async def test(ctx, arg0, arg1=0):
 	logging.info(f'test at {datetime.datetime.utcnow()}')
 	await ctx.send(f'Hello there! {arg0} + {arg1} = {int(arg0) + int(arg1)}')
-		
+
 @tasks.loop(minutes=1.0)
 async def gmail():
 	logging.info('Checking gmail...')
