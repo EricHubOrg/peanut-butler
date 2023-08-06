@@ -12,6 +12,7 @@ from googleapiclient.discovery import build
 import chatbot
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 def get_roles(ctx=None, guild=None):
 	if ctx:
@@ -98,11 +99,9 @@ bot = commands.Bot(
 	intents=intents,
 )
 
-with open('data/bot_data/bot_data.json', 'r') as f:
+with open(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json', 'r') as f:
 	bot.data = json.load(f)
 	bot.warning_state = 0
-
-logging.basicConfig(level=logging.INFO)
 
 # Remove the default help command
 bot.remove_command('help')
@@ -125,14 +124,14 @@ async def help(ctx, arg0=None):
 			await ctx.send(f'No existeix cap comandament que es digui "{arg0}"')
 	else:
 		# List all commands
-		file = discord.File("data/bot_data/peanut_butler.png", filename="peanut_butler.png")
-		embed = Embed(title="Peanut Butler", description=bot.description, color=int(bot.data['embed_color'], 16))
+		file = discord.File(f'{os.environ["DATA_PATH"]}/bot_data/peanut_butler.png', filename='peanut_butler.png')
+		embed = Embed(title='Peanut Butler', description=bot.description, color=int(bot.data['embed_color'], 16))
 		embed.set_thumbnail(url='attachment://peanut_butler.png')
 		embed.set_author(name='Eric Lopez', url='https://github.com/Pikurrot', icon_url='https://avatars.githubusercontent.com/u/90217719?v=4')
 		for command in sorted(bot.commands, key=lambda command: command.name):
 			if command.name != 'help':
 				embed.add_field(name=command.name, value=command.brief, inline=False)
-		await ctx.send(embed=embed, file=file)
+		await ctx.send(embed=embed, file=file) #rata
 
 @bot.event
 async def on_ready():
@@ -159,11 +158,11 @@ async def on_message(message):
 				response, conversation = await chatbot.generate(prompt, bot.data['conversation'], os.environ['CHATBOT_API_URL'], os.environ['CHATBOT_API_KEY'])
 				if response is not None:
 					logging.info('Response generated successfully. Updating bot conversation...')
-					conversation_limit = json.loads(await read_from_file('/data/bot_data/bot_data.json'))['conversation_limit']
+					conversation_limit = json.loads(await read_from_file(F'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'))['conversation_limit']
 					conversation['past_user_inputs'] = conversation['past_user_inputs'][-conversation_limit:]
 					conversation['generated_responses'] = conversation['generated_responses'][-conversation_limit:]
 					bot.data['conversation'] = conversation
-					await write_to_file('/data/bot_data/bot_data.json', json.dumps(bot.data))
+					await write_to_file(F'{os.environ["DATA_PATH"]}/bot_data/bot_data.json', json.dumps(bot.data))
 					logging.info('Conversation updated')
 					await message.channel.send(response)
 				else:
