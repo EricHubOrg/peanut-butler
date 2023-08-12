@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
-import datetime
-import os, base64, logging, asyncio, json
+import datetime, dateparser, re
+import os, base64, logging, asyncio, json, uuid
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.events import EVENT_JOB_REMOVED
 
 import discord
 from discord import Intents, DMChannel, utils, Embed
@@ -10,6 +12,8 @@ from google_api import _get_credentials_sync
 from googleapiclient.discovery import build
 
 import chatbot
+from reminders import *
+from utils import *
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -71,28 +75,25 @@ def get_greeting():
 		return 'Bona tarda'
 	else:
 		return 'Bona nit'
-	
-def _read_from_file_sync(filename):
-	with open(filename, 'r') as f:
-		return f.read()
-
-async def read_from_file(filename):
-	loop = asyncio.get_event_loop()
-	content = await loop.run_in_executor(None, _read_from_file_sync, filename)
-	return content
-
-def _write_to_file_sync(filename, content):
-	with open(filename, 'w') as f:
-		f.write(content)
-
-async def write_to_file(filename, content):
-	loop = asyncio.get_event_loop()
-	await loop.run_in_executor(None, _write_to_file_sync, filename, content)
 
 async def get_credentials():
 	credentials = await _get_credentials_sync()
 	return credentials
 
+async def on_job_removed(event):
+	job = scheduler.get_job(event.job_id)
+	if not job:
+		return
+	if 'reminder' in job.tags:
+		# get reminder and remove it from file
+		rem = await retrieve_reminder_from_file(event.job_id, remove=True)
+		# warn user if reminder end_date passed before activation_date (bot was offline when the reminder ended)
+		if rem:
+			end_date = datetime.datetime.strptime(rem['end_date'], '%Y-%m-%d %H:%M:%S')
+			activation_date = datetime.datetime.strptime(rem['activation_date'], '%Y-%m-%d %H:%M:%S')
+			if end_date < activation_date:
+				channel = bot.get_channel(rem['channel_id'])
+				await channel.send(f'{rem["author_id"]}, el recordatori "{rem["message"]}" ha caducat mentres jo estava offline.')
 
 intents = Intents.default()
 intents.message_content = True
@@ -103,9 +104,11 @@ bot = commands.Bot(
 	intents=intents,
 )
 
-with open(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json', 'r') as f:
-	bot.data = json.load(f)
-	bot.warning_state = 0
+scheduler = AsyncIOScheduler()
+scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
+
+bot.data = json.loads(read_from_file_sync(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'))
+bot.warning_state = 0
 
 # Remove the default help command
 bot.remove_command('help')
@@ -142,6 +145,8 @@ async def on_ready():
 	logging.info(f'We have logged in as {bot.user}')
 	keep_alive.start()
 	# gmail.start()
+	scheduler.start()
+	await activate_saved_reminders(scheduler, bot)
 
 @bot.event
 async def on_message(message):
@@ -175,10 +180,125 @@ async def on_message(message):
 				await message.channel.send('Ho sento, però algo ha fallat')
 				logging.info(f'Response failed to send: {e}')
 		return
+	
+	if message.reference:
+		# message is a reply
+		referenced_message_id = message.reference.message_id
+		referenced_message = await message.channel.fetch_message(referenced_message_id)
+		if referenced_message.author == bot.user:
+			# check if reaction is from an open reminder
+			open_rem, data = await retrieve_reminder_from_file(referenced_message_id, key='q_message_id', type='open_reminders', return_data=True)
+			if open_rem:
+				# check if message is from the user who set the reminder
+				if message.author.id == open_rem['author_id']:
+					await complete_open_reminder(bot, open_rem['id'], user_input=message.content, rem=open_rem, data=data)
 
 	# process commands normally
 	await bot.process_commands(message)
 
+@bot.event
+async def on_reaction_add(reaction, user):
+	if user.bot:
+		# ignore reactions from other bots
+		return
+
+	# check if reaction is from an open reminder
+	open_rem, data = await retrieve_reminder_from_file(reaction.message.id, key='q_message_id', type='open_reminders', return_data=True)
+	if open_rem:
+		# check if reaction is from the user who set the reminder
+		if user.id == open_rem['author_id']:
+			await complete_open_reminder(bot, open_rem['id'], emoji=reaction.emoji, rem=open_rem, data=data)
+
+	if reaction.emoji == '⏰':
+		if not isinstance(reaction.message.channel, discord.threads.Thread):
+			# reaction is not in a thread
+			await reminder(user=user, reaction=reaction)
+
+@bot.command(
+		brief='Set a reminder.',
+		description='Set a reminder of a message. Also works by reacting to a message with :⏰_clock:.',
+		usage='In a channel: %reminder [message]\nIn a thread: %reminder'
+)
+async def reminder(ctx=None, *args, **kwargs):
+	if ctx:
+		# command is called by user (channel or thread)
+		try:
+			thread = ctx.channel.thread
+		except AttributeError:
+			thread = None
+		author = ctx.author
+		if thread:
+			message = thread.first_message
+			message_text = message.content
+		else:
+			message = ctx.message
+			message_text = ' '.join(args)
+		guild = ctx.guild
+		channel = ctx.channel
+		by_reaction = False
+	else:
+		# command is called by reaction (channel)
+		thread = None
+		author = kwargs['user']
+		message = kwargs['reaction'].message
+		message_text = message.content
+		guild = message.guild
+		channel = message.channel
+		by_reaction = True
+		
+	if check_authority(2, author=author, guild=guild, channel=channel):
+		if thread:
+			# command is called by user in a thread
+			if thread.archived:
+				# the thread is closed
+				await thread.send('Ho sento, però el fil està tancat.')
+				return
+			else:
+				# react to the message
+				await message.add_reaction('⏰')
+				q_message_mention = True
+		else:
+			# command is triggered in the channel (reaction or message)
+			q_message_mention = False
+			thread = await channel.create_thread(name=message_text, message=message, auto_archive_duration=60)
+			if by_reaction:
+				# remove the reaction
+				await kwargs['reaction'].remove(author)
+			# react to the message
+			await message.add_reaction('⏰')
+	elif ctx:
+		# user does not have authority
+		await ctx.send('Ho sento, però no tens autoritat per fer això.')
+		return
+	else:
+		return
+
+	# send creation message
+	start_with = (str(author.mention)+' ') if q_message_mention else ''
+	creation_message = await thread.send(f'{start_with}Has creat un recordatori amb missatge **{message_text}**.\
+Vols establir els paràmetres? *Sinó, el recordatori es cancel·larà en 1 hora*.')
+	await creation_message.add_reaction('❔')
+	await creation_message.add_reaction('✅')
+	await creation_message.add_reaction('❌')
+
+	# save the reminder as open
+	rem_id = str(uuid.uuid4())
+	f = await read_from_file(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json')
+	data = json.loads(f)
+	data['open_reminders'].append({
+		'id': rem_id,
+		'q_message_id': creation_message.id,
+		'start_with': start_with,
+		'author_id': author.id,
+		'channel_id': channel.id,
+		'thread_id': thread.id,
+		'message': message.content,
+		'step': 0
+	})
+	await write_to_file(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json', json.dumps(data))
+
+	# schedule the reminder to be cancelled
+	scheduler.add_job(pop_open_reminder, trigger='date', run_date=datetime.datetime.now() + datetime.timedelta(hours=1), args=[rem_id], id=rem_id)
 
 @bot.command(
 		brief='Breu descripció del commandament `test`.',
