@@ -51,13 +51,19 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
+
+    - name: Start ssh-agent
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+        ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
     
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.SERVER_HOST }}
+        host: 10.0.0.1
         username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
+        key: /tmp/id_rsa
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
           docker stop peanut-butler || true
