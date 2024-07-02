@@ -15,6 +15,28 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Install WireGuard
+      run: sudo apt-get install -y wireguard
+
+    - name: Configure WireGuard
+      run: |
+        echo "${{ secrets.WG_CLIENT_PRIVATE_KEY }}" > client_private.key
+        echo "${{ secrets.WG_CLIENT_PUBLIC_KEY }}" > client_public.key
+
+        sudo bash -c 'cat > /etc/wireguard/wg0.conf <<EOF
+        [Interface]
+        PrivateKey = $(cat client_private.key)
+        Address = 10.0.0.2/24
+
+        [Peer]
+        PublicKey = ${{ secrets.WG_SERVER_PUBLIC_KEY }}
+        Endpoint = ${{ secrets.WG_SERVER_IP }}:51820
+        AllowedIPs = 0.0.0.0/0
+        PersistentKeepalive = 21
+        EOF'
+
+        sudo systemctl start wg-quick@wg0
       
     - name: Login to Docker Hub
       uses: docker/login-action@v3
