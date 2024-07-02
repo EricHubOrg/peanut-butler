@@ -16,14 +16,33 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up WireGuard
-      uses: egor-tensin/setup-wireguard@v1
-      with:
-        endpoint: '${{ secrets.WG_SERVER_IP }}:51820'
-        endpoint_public_key: '${{ secrets.WG_SERVER_PUBLIC_KEY }}'
-        ips: '10.0.0.2/24'
-        allowed_ips: '0.0.0.0/0'
-        private_key: '${{ secrets.WG_CLIENT_PRIVATE_KEY }}'
+    - name: Install WireGuard
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wireguard
+        sudo systemctl daemon-reload
+        sudo systemctl restart wg-quick@wg0
+        sleep 10  # Adding a delay to ensure services restart properly
+
+    - name: Configure WireGuard
+      run: |
+        echo "${{ secrets.WG_CLIENT_PRIVATE_KEY }}" > client_private.key
+        echo "${{ secrets.WG_CLIENT_PUBLIC_KEY }}" > client_public.key
+
+        sudo bash -c 'cat > /etc/wireguard/wg0.conf <<EOF
+        [Interface]
+        PrivateKey = $(cat client_private.key)
+        Address = 10.0.0.2/24
+
+        [Peer]
+        PublicKey = ${{ secrets.WG_SERVER_PUBLIC_KEY }}
+        Endpoint = ${{ secrets.WG_SERVER_IP }}:51820
+        AllowedIPs = 0.0.0.0/0
+        PersistentKeepalive = 21
+        EOF'
+
+        sudo systemctl start wg-quick@wg0
+        sleep 5  # Adding a delay to ensure WireGuard starts properl
       
     - name: Login to Docker Hub
       uses: docker/login-action@v3
