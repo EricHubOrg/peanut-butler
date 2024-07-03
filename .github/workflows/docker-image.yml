@@ -10,33 +10,11 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Install WireGuard
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y wireguard
-
-    - name: Configure WireGuard
-      run: |
-        echo "${{ secrets.WG_CLIENT_PRIVATE_KEY }}" > client_private.key
-        echo "${{ secrets.WG_CLIENT_PUBLIC_KEY }}" > client_public.key
-
-        sudo bash -c 'cat > /etc/wireguard/wg0.conf <<EOF
-        [Interface]
-        PrivateKey = $(cat client_private.key)
-        Address = 10.0.0.2/24
-
-        [Peer]
-        PublicKey = ${{ secrets.WG_SERVER_PUBLIC_KEY }}
-        Endpoint = ${{ secrets.WG_SERVER_IP }}:51820
-        AllowedIPs = 0.0.0.0/0
-        PersistentKeepalive = 21
-        EOF'
       
     - name: Login to Docker Hub
       uses: docker/login-action@v3
@@ -52,26 +30,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
 
-    - name: Start ssh-agent
+    - name: Deploy Docker container
       run: |
-        echo "${{ secrets.SERVER_SSH_KEY }}" > id_rsa
-        chmod 600 id_rsa
-        eval "$(ssh-agent -s)"
-        echo 'echo "${{ secrets.SSH_PASSPHRASE }}"' > ~/.ssh_askpass
-        chmod +x ~/.ssh_askpass
-        DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add id_rsa
-        ssh-add -L  # List added keys to debug
-    
-    - name: SSH to Server and Deploy
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: 10.0.0.1
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        port: 2222
-        script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
-          docker stop peanut-butler || true
-          docker rm peanut-butler || true
-          docker run -d --name peanut-butler ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
+        docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
+        docker stop peanut-butler || true
+        docker rm peanut-butler || true
+        docker run -d --name peanut-butler ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
