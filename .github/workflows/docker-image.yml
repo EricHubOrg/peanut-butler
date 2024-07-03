@@ -69,6 +69,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        port: 2222
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
           docker stop peanut-butler || true
