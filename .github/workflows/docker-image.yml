@@ -54,7 +54,7 @@ jobs:
 
     - name: Start ssh-agent
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
+        echo "${{ secrets.SERVER_SSH_KEY }}" > id_rsa
         chmod 600 id_rsa
         eval "$(ssh-agent -s)"
         echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add id_rsa
