@@ -35,4 +35,12 @@ jobs:
         docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
         docker stop peanut-butler || true
         docker rm peanut-butler || true
-        docker run -d --name peanut-butler ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
+        docker run -d --name peanut-butler \
+          -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
+          -e DISCORD_USER_ID=${{ secrets.DISCORD_USER_ID }} \
+          -e CHANNEL_ID_ALTA_TAULA=${{ secrets.CHANNEL_ID_ALTA_TAULA }} \
+          -e CHANNEL_ID_TEST_BOTS=${{ secrets.CHANNEL_ID_TEST_BOTS }} \
+          -e CHATBOT_API_KEY=${{ secrets.CHATBOT_API_KEY }} \
+          -e CHATBOT_API_URL=${{ secrets.CHATBOT_API_URL }} \
+          -e DATA_PATH=${{ secrets.DATA_PATH }} \
+          ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
