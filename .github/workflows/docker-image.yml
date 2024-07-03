@@ -53,17 +53,18 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
 
     - name: Start ssh-agent
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-        ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
+        chmod 600 id_rsa
+        eval "$(ssh-agent -s)"
+        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add id_rsa
     
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: 10.0.0.1
         username: ${{ secrets.SERVER_USER }}
-        key: /tmp/id_rsa
+        key: id_rsa
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
           docker stop peanut-butler || true
