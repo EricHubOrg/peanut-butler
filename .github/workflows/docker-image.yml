@@ -58,13 +58,17 @@ jobs:
         chmod 600 id_rsa
         eval "$(ssh-agent -s)"
         echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add id_rsa
+        chmod +x ~/.ssh_askpass
+        DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add id_rsa
+        ssh-add -L  # List added keys to debug
     
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: 10.0.0.1
         username: ${{ secrets.SERVER_USER }}
-        key: id_rsa
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
           docker stop peanut-butler || true
