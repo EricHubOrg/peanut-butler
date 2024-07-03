@@ -57,7 +57,7 @@ jobs:
         echo "${{ secrets.SERVER_SSH_KEY }}" > id_rsa
         chmod 600 id_rsa
         eval "$(ssh-agent -s)"
-        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add id_rsa
+        echo 'echo "${{ secrets.SSH_PASSPHRASE }}"' > ~/.ssh_askpass
         chmod +x ~/.ssh_askpass
         DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add id_rsa
         ssh-add -L  # List added keys to debug
