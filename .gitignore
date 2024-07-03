@@ -4,4 +4,5 @@ test2.py
 personality.txt
 __pycache__
 *.json
+!bot_data.json
 chatbot_local.py
