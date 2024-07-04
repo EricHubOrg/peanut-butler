@@ -77,8 +77,7 @@ def get_greeting():
 		return 'Bona nit'
 
 async def get_credentials():
-	credentials = await _get_credentials_sync()
-	return credentials
+	return await asyncio.to_thread(_get_credentials_sync)
 
 async def on_job_removed(event):
 	job = scheduler.get_job(event.job_id)
@@ -153,7 +152,7 @@ async def help(ctx, arg0=None):
 async def on_ready():
 	logging.info(f'We have logged in as {bot.user}')
 	keep_alive.start()
-	# gmail.start()
+	gmail.start()
 	scheduler.start()
 	await activate_saved_reminders(scheduler, bot)
 
