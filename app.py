@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_REMOVED
 
 import discord
-from discord import Intents, DMChannel, utils, Embed
+from discord import Intents, DMChannel, utils, Embed, Color
 from discord.ext import commands, tasks
 
 from utils import *
@@ -106,7 +106,7 @@ async def help(ctx, arg0=None):
 		# Give info about the command
 		command = bot.get_command(arg0)
 		if command:
-			embed = Embed(title=command.name, description=command.description, color=int(bot.data['embed_color'], 16))
+			embed = Embed(title=command.name, description=command.description, color=Color.blue())
 			embed.add_field(name='us', value=f'`{command.usage}`')
 			await ctx.send(embed=embed)
 		else:
@@ -114,7 +114,7 @@ async def help(ctx, arg0=None):
 	else:
 		# List all commands
 		file = discord.File(f'{os.environ["DATA_PATH"]}/bot_data/peanut_butler.png', filename='peanut_butler.png')
-		embed = Embed(title='Peanut Butler', description=bot.description, color=int(bot.data['embed_color'], 16))
+		embed = Embed(title='Peanut Butler', description=bot.description, color=Color.blue())
 		embed.set_thumbnail(url='attachment://peanut_butler.png')
 		embed.set_author(name='Eric Lopez', url='https://github.com/Pikurrot', icon_url='https://avatars.githubusercontent.com/u/90217719?v=4')
 		for command in sorted(bot.commands, key=lambda command: command.name):
