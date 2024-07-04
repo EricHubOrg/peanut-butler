@@ -89,9 +89,6 @@ scheduler = AsyncIOScheduler()
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
 # to debug
-logging.info(f'Current working directory: {os.getcwd()}')
-logging.info(f'Files in current directory: {os.listdir(".")}')
-logging.info(f'Files in data directory: {os.listdir("data")}')
 for key in os.environ:
 	print(f'{key}={os.environ[key]}')
 
