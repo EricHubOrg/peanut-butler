@@ -46,7 +46,7 @@ async def send_reminder(bot, reminder_id):
 async def activate_saved_reminders(scheduler, bot):
 	# activate all saved reminders
 	f = await read_from_file(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json')
-	reminders = json.loads(f)['reminders']
+	reminders = json.loads(f).get('reminders', [])
 	for rem in reminders:
 		not_args = ('author_id', 'channel_id', 'message', 'mention', 'activation_date')
 		rem_kwargs = {key:value for key, value in rem.items() if key not in not_args}
