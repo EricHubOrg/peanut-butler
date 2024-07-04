@@ -111,10 +111,10 @@ scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 os.makedirs(f'{os.environ["DATA_PATH"]}/bot_data', exist_ok=True)
 if not os.path.exists(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'):
 	with open(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json', 'w') as f:
-		json.dump({})
+		json.dump({}, f)
 if not os.path.exists(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json'):
 	with open(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json', 'w') as f:
-		json.dump({})
+		json.dump({}, f)
 
 bot.data = json.loads(read_from_file_sync(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'))
 bot.warning_state = 0
