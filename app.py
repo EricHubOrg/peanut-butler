@@ -107,7 +107,15 @@ bot = commands.Bot(
 scheduler = AsyncIOScheduler()
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
-# bot.data = json.loads(read_from_file_sync(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'))
+# ensure bot_data.json and roaming.json
+if not os.path.exists(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'):
+	with open(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json', 'w') as f:
+		json.dump({})
+if not os.path.exists(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json'):
+	with open(f'{os.environ["DATA_PATH"]}/bot_data/roaming.json', 'w') as f:
+		json.dump({})
+
+bot.data = json.loads(read_from_file_sync(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'))
 bot.warning_state = 0
 
 # Remove the default help command
