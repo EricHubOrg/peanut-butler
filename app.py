@@ -90,7 +90,7 @@ scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
 # to debug
 for key in os.environ:
-	print(f'{key}={os.environ[key]}')
+	logging.info(f'{key}={os.environ[key]}')
 
 # Remove the default help command
 bot.remove_command('help')
