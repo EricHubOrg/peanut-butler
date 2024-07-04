@@ -1,9 +1,4 @@
 python-dotenv==1.0.0
 discord==2.3.0
-google-api-python-client==2.90.0
-google-api-core==2.11.1
-google-auth==2.18.1
-google-auth-oauthlib==1.0.0
 aiohttp==3.8.5
 apscheduler==3.10.1
-dateparser==1.1.8
