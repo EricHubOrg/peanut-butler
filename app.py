@@ -88,10 +88,6 @@ bot = commands.Bot(
 scheduler = AsyncIOScheduler()
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
-# to debug
-for key in os.environ:
-	logging.info(f'{key}={os.environ[key]}')
-
 # Remove the default help command
 bot.remove_command('help')
 
@@ -113,7 +109,7 @@ async def help(ctx, arg0=None):
 			await ctx.send(f'No existeix cap comandament que es digui "{arg0}"')
 	else:
 		# List all commands
-		file = discord.File(f'{os.environ["DATA_PATH"]}/bot_data/peanut_butler.png', filename='peanut_butler.png')
+		file = discord.File(f'data/bot_data/peanut_butler.png', filename='peanut_butler.png')
 		embed = Embed(title='Peanut Butler', description=bot.description, color=Color.blue())
 		embed.set_thumbnail(url='attachment://peanut_butler.png')
 		embed.set_author(name='Eric Lopez', url='https://github.com/Pikurrot', icon_url='https://avatars.githubusercontent.com/u/90217719?v=4')

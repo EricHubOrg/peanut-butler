@@ -40,7 +40,4 @@ jobs:
           -e DISCORD_USER_ID=${{ secrets.DISCORD_USER_ID }} \
           -e CHANNEL_ID_ALTA_TAULA=${{ secrets.CHANNEL_ID_ALTA_TAULA }} \
           -e CHANNEL_ID_TEST_BOTS=${{ secrets.CHANNEL_ID_TEST_BOTS }} \
-          -e CHATBOT_API_KEY=${{ secrets.CHATBOT_API_KEY }} \
-          -e CHATBOT_API_URL=${{ secrets.CHATBOT_API_URL }} \
-          -e DATA_PATH=${{ secrets.DATA_PATH }} \
           ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
