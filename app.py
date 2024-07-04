@@ -13,51 +13,6 @@ from utils import *
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-def get_roles(ctx=None, guild=None):
-	if ctx:
-		guild = ctx.guild
-	roles = ['simple mortal', 'bots publics', 'privilegiat', 'alta taula', 'CREADOR']
-	return {name:utils.get(guild.roles, name=name) for name in roles}
-
-def get_deny_message(ctx=None, author=None, channel=None):
-	if ctx:
-		author = ctx.author
-		channel = ctx.channel
-	if author.id != int(os.environ['DISCORD_USER_ID']):
-		return f'Ho sento {author.mention}, però no tens permís per fer això.'
-	elif channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
-		return f"Ho sento Creador, però aquests temes només els tractem a l'{bot.get_channel(int(os.environ['CHANNEL_ID_alta_taula'])).mention}"
-	else:
-		return None
-
-def check_authority(level, ctx=None, author=None, guild=None, channel=None):
-	# level 0: >= simple mortal
-	# level 1: >= bots publics
-	# level 2: >= privilegiat
-	# level 3: >= alta taula
-	# level 4: == CREADOR
-	# level 5: == CREADOR (alta_taula or test_bots)
-	if ctx:
-		author = ctx.author
-		guild = ctx.guild
-		channel = ctx.channel
-	roles = get_roles(guild=guild)
-	author_role = author.top_role
-
-	if level == 0 and author_role < roles['simple mortal']:
-		return 0
-	elif level == 1 and author_role < roles['bots publics']:
-		return 0
-	elif level == 2 and author_role < roles['privilegiat']:
-		return 0
-	elif level == 3 and author_role < roles['alta taula']:
-		return 0
-	elif level == 4 and author_role != roles['CREADOR']:
-		return 0
-	elif level == 5 and author_role != roles['CREADOR'] or channel.id not in [int(os.environ['CHANNEL_ID_alta_taula']), int(os.environ['CHANNEL_ID_test_bots'])]:
-		return 0
-	return 1
-
 def get_greeting():
 	now = datetime.datetime.now()
 	current_hour = now.hour

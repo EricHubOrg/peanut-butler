@@ -38,6 +38,4 @@ jobs:
         docker run -d --name peanut-butler \
           -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
           -e DISCORD_USER_ID=${{ secrets.DISCORD_USER_ID }} \
-          -e CHANNEL_ID_ALTA_TAULA=${{ secrets.CHANNEL_ID_ALTA_TAULA }} \
-          -e CHANNEL_ID_TEST_BOTS=${{ secrets.CHANNEL_ID_TEST_BOTS }} \
           ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
