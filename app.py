@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import datetime, dateparser, re
-import os, base64, logging, asyncio, json, uuid
+import os, base64, logging, asyncio, json, uuid, sys
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_REMOVED
 
@@ -108,6 +108,7 @@ scheduler = AsyncIOScheduler()
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
 # ensure bot_data.json and roaming.json
+os.makedirs(f'{os.environ["DATA_PATH"]}/bot_data', exist_ok=True)
 if not os.path.exists(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json'):
 	with open(f'{os.environ["DATA_PATH"]}/bot_data/bot_data.json', 'w') as f:
 		json.dump({})
