@@ -1,3 +1,4 @@
 .env
 __pycache__
 deprecated
+data/commands.json

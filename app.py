@@ -33,14 +33,14 @@ def get_greeting() -> str:
 	now = datetime.datetime.now()
 	current_hour = now.hour
 
-	if current_hour < 6:
-		return "Bona nit"
+	if current_hour < 5:
+		return msg.get("greeting_night")
 	elif current_hour < 15:
-		return "Bon dia"
+		return msg.get("greeting_morning")
 	elif current_hour < 21:
-		return "Bona tarda"
+		return msg.get("greeting_afternoon")
 	else:
-		return "Bona nit"
+		return msg.get("greeting_evening")
 
 async def on_job_removed(event: Any):
 	"""

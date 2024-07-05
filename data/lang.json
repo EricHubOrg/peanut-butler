@@ -48,5 +48,20 @@
 		"en": "Hello there! {} + {} = {}",
 		"es": "¡Hola! {} + {} = {}",
 		"ca": "Hola! {} + {} = {}"
+	},
+	"greeting_night": {
+		"en": "Good night",
+		"es": "Buenas noches",
+		"ca": "Bona nit"
+	},
+	"greeting_morning": {
+		"en": "Good morning",
+		"es": "Buenos días",
+		"ca": "Bon dia"
+	},
+	"greeting_afternoon": {
+		"en": "Good afternoon",
+		"es": "Buenas tardes",
+		"ca": "Bona tarda"
 	}
 }
