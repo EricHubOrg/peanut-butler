@@ -1,15 +1,17 @@
 from dotenv import load_dotenv
 import datetime
-import os, base64, logging, asyncio, json, uuid
+import os
+import logging
+import json
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_REMOVED
 from typing import Any
 
 import discord
-from discord import Intents, DMChannel, utils, Embed, Color
+from discord import Intents, DMChannel, Embed, Color
 from discord.ext import commands, tasks
 
-from utils import *
+from utils import reformat_lang_dict
 
 load_dotenv()
 LANG = os.environ.get("LANG", "en")
@@ -135,7 +137,7 @@ async def test(
 
 @tasks.loop(minutes=1.0)
 async def keep_alive():
-	logging.info(f"Life signal")
+	logging.info("Life signal")
 
 @keep_alive.before_loop
 async def before_keep_alive():
