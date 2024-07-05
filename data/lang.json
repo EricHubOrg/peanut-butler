@@ -1,0 +1,52 @@
+{
+	"bot_description": {
+		"en": "A bot to manage a private home server. Type `%help` to see available commands.",
+		"es": "Un bot para gestionar un servidor privado. Escribe `%help` para ver los comandos disponibles.",
+		"ca": "Un bot per gestionar un servidor privat. Escriu `%help` per veure els comandaments disponibles."
+	},
+	"help_brief": {
+		"en": "Shows this help message.",
+		"es": "Muestra este mensaje de ayuda.",
+		"ca": "Mostra aquest missatge d'ajuda."
+	},
+	"help_detail": {
+		"en": "Shows a list of available commands.",
+		"es": "Muestra una lista de comandos disponibles.",
+		"ca": "Mostra una llista de comandaments disponibles."
+	},
+	"help_usage": {
+		"en": "`%help (command)`",
+		"es": "`%help (comando)`",
+		"ca": "`%help (comandament)`"
+	},
+	"command_not_found": {
+		"en": "There is no command with name `{}`.",
+		"es": "No hay ningún comando con el nombre `{}`.",
+		"ca": "No hi ha cap comandament amb el nom `{}`."
+	},
+	"no_dm": {
+		"en": "Sorry yoy can't talk to me in private",
+		"es": "Lo siento, no puedes hablarme en privado",
+		"ca": "Ho sento, no em pots parlar en privat"
+	},
+	"test_brief": {
+		"en": "Brief description of the `test` command.",
+		"es": "Descripción breve del comando `test`.",
+		"ca": "Descripció breu del comandament `test`."
+	},
+	"test_detail": {
+		"en": "Detailed description of the `test` command.",
+		"es": "Descripción detallada del comando `test`.",
+		"ca": "Descripció detallada del comandament `test`."
+	},
+	"test_usage": {
+		"en": "`%test [arg1] (arg2)`",
+		"es": "`%test [arg1] (arg2)`",
+		"ca": "`%test [arg1] (arg2)`"
+	},
+	"test_msg": {
+		"en": "Hello there! {} + {} = {}",
+		"es": "¡Hola! {} + {} = {}",
+		"ca": "Hola! {} + {} = {}"
+	}
+}
