@@ -114,6 +114,11 @@
 		"es": "Introduce la palabra clave para indicar estado inactivo:",
 		"ca": "Introdueix la paraula clau per indicar l'estat inactiu:"
 	},
+	"monitor_info_inactive": {
+		"en": "If this keyword is present (or absent: indicate with `!<keyword>`) in the status message, the process is considered inactive.",
+		"es": "Si esta palabra clave está presente (o ausente: indicar con `!<palabra clave>`) en el mensaje de estado, el proceso se considera inactivo.",
+		"ca": "Si aquesta paraula clau està present (o absent: indicar amb `!<paraula clau>`) en el missatge d'estat, el procés es considera inactiu."
+	},
 	"monitor_thread_success": {
 		"en": "Command added successfully!",
 		"es": "¡Comando añadido correctamente!",
