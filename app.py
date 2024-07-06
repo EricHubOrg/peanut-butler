@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-import datetime
 import os
 import logging
 import json
@@ -15,6 +14,7 @@ from utils import reformat_lang_dict
 
 load_dotenv()
 LANG = os.environ.get("LANG", "en")
+
 # Load messages in the selected language
 with open(os.path.join("data", "lang.json"), "r") as f:
 	lang_dict = json.load(f)
@@ -25,30 +25,6 @@ logging.basicConfig(
 	level=logging.INFO,
 	datefmt="%Y-%m-%d %H:%M:%S"
 )
-
-def get_greeting() -> str:
-	"""
-	Returns a greeting based on the current time of day.
-	"""
-	now = datetime.datetime.now()
-	current_hour = now.hour
-
-	if current_hour < 5:
-		return msg.get("greeting_night")
-	elif current_hour < 15:
-		return msg.get("greeting_morning")
-	elif current_hour < 21:
-		return msg.get("greeting_afternoon")
-	else:
-		return msg.get("greeting_evening")
-
-async def on_job_removed(event: Any):
-	"""
-	Remove the job from the scheduler when it is removed.
-	"""
-	job = scheduler.get_job(event.job_id)
-	if not job:
-		return
 
 # Set up the bot
 intents = Intents.default()
@@ -61,7 +37,17 @@ bot = commands.Bot(
 
 # Set up the scheduler
 scheduler = AsyncIOScheduler()
+async def on_job_removed(event: Any):
+	"""
+	Remove the job from the scheduler when it is removed.
+	"""
+	job = scheduler.get_job(event.job_id)
+	if not job:
+		return
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
+
+
+# ========= DISCORD COMMANDS ==========
 
 # Create a new help command
 bot.remove_command("help") # Remove the default
@@ -77,6 +63,7 @@ async def help(
 	"""
 	Displays information about the available commands.
 	"""
+	logging.info(f"Help command executed by {ctx.author}")
 	color = Color.blue()
 	if arg0:
 		# Give info about the command
