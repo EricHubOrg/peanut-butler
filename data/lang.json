@@ -89,6 +89,11 @@
 		"es": "Vamos a configurar un nuevo comando para monitorizar un proceso.",
 		"ca": "Anem a configurar un nou comandament per monitoritzar un procés."
 	},
+	"monitor_q_name": {
+		"en": "Enter the name of the process:",
+		"es": "Introduce el nombre del proceso:",
+		"ca": "Introdueix el nom del procés:"
+	},
 	"monitor_q_command": {
 		"en": "Enter the command to check status:",
 		"es": "Introduce el comando para comprobar el estado:",

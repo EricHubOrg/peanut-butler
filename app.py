@@ -198,13 +198,15 @@ async def monitor(ctx: commands.Context):
 
 	await thread.send(msg.get("monitor_thread_intro"))
 
-	command = await ask_question_thread(thread, msg.get("monitor_q_command"), msg.get("monitor_info_command"), ctx.author.id)
-	active_keyword = await ask_question_thread(thread, msg.get("monitor_q_active"), msg.get("monitor_info_active"), ctx.author.id)
-	inactive_keyword = await ask_question_thread(thread, msg.get("monitor_q_inactive"), msg.get("monitor_info_inactive"), ctx.author.id)
+	name = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_name"))
+	command = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_command"), msg.get("monitor_info_command"))
+	active_keyword = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_active"), msg.get("monitor_info_active"))
+	inactive_keyword = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_inactive"), msg.get("monitor_info_inactive"))
 
 	# Save the command details
 	commands = load_commands()
 	commands.append({
+		"name": name,
 		"command": command,
 		"active_keyword": active_keyword,
 		"inactive_keyword": inactive_keyword
