@@ -14,14 +14,14 @@ from discord.ext import commands, tasks
 from utils import load_commands, reformat_lang_dict, save_commands
 
 load_dotenv()
-LANG = os.environ.get("LANG", "en")
-print(LANG)
+LANGUAGE = os.environ.get("LANGUAGE", "en")
+print(LANGUAGE)
 QUESTION_MARK = "❓"
 
 # Load messages in the selected language
 with open(os.path.join("data", "lang.json"), "r") as f:
 	lang_dict = json.load(f)
-msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANG)
+msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANGUAGE)
 
 # Set up logging
 logging.basicConfig(

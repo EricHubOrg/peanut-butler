@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-LANG = os.environ.get("LANG", "en")
+LANGUAGE = os.environ.get("LANGUAGE", "en")
 COMMANDS_FILE = os.path.join("data", "commands.json")
 
 def reformat_lang_dict(lang_dict: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
@@ -23,7 +23,7 @@ def reformat_lang_dict(lang_dict: dict[str, dict[str, str]]) -> dict[str, dict[s
 # Load messages in the selected language
 with open(os.path.join("data", "lang.json"), "r") as f:
 	lang_dict = json.load(f)
-msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANG, "en")
+msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANGUAGE, "en")
 
 def read_from_file_sync(filename: str) -> str:
 	with open(filename, "r") as f:
