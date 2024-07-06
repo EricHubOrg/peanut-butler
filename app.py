@@ -173,6 +173,7 @@ async def help(
 				embed.add_field(name=command.name, value=command.brief, inline=False)
 		await ctx.send(embed=embed, file=file)
 
+
 @bot.command(
 		brief=msg.get("test_brief"),
 		description=msg.get("test_detail"),
@@ -186,19 +187,32 @@ async def test(
 	logging.info(f"Test command executed by {ctx.author}")
 	await ctx.send(msg.get("test_msg").format(arg0, arg1, arg0 + arg1))
 
-@bot.command(
+
+@bot.group(
 	brief=msg.get("monitor_brief"),
 	description=msg.get("monitor_detail"),
-	usage=msg.get("monitor_usage")
+	usage="%monitor <add|remove|status>"
 )
 async def monitor(ctx: commands.Context):
+	if ctx.invoked_subcommand is None:
+		await ctx.send("Invalid monitor command. Use `%monitor add` or `%monitor remove`.")
+
+
+@monitor.command(
+    brief="Add a new command to monitor",
+    description="Interactively add a new command to monitor its status.",
+	usage="%monitor add"
+)
+async def add(ctx: commands.Context):
 	"""
 	Set up a new command to monitor a process.
 	"""
+	# Create a thread from user's message
 	thread = await ctx.message.create_thread(name=msg.get("monitor_thread_name"))
 
 	await thread.send(msg.get("monitor_thread_intro"))
 
+	# Ask the user for the monitoring details
 	name = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_name"))
 	command = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_command"), msg.get("monitor_info_command"))
 	active_keyword = await ask_question_thread(thread, ctx.author.id, msg.get("monitor_q_active"), msg.get("monitor_info_active"))
@@ -221,9 +235,28 @@ async def monitor(ctx: commands.Context):
 	# close the thread
 	await thread.edit(archived=True)
 
-@bot.command(
+
+@monitor.command(
+    brief="Remove a monitored command",
+    description="Remove a command from monitoring by providing the process name.",
+	usage="%monitor remove <process_name>"
+)
+async def remove(ctx: commands.Context, process_name: str):
+	commands = load_commands()
+	# Remove the command from the list
+	updated_commands = [cmd for cmd in commands if cmd["command"] != process_name]
+
+	if len(updated_commands) == len(commands):
+		await ctx.send(f"No monitored command found for process `{process_name}`.")
+	else:
+		save_commands(updated_commands)
+		await ctx.send(f"Command `{process_name}` removed successfully!")
+
+
+@monitor.command(
     brief="Check the status of monitored processes",
-    description="Run saved commands and print the status of the monitored processes."
+    description="Run saved commands and print the status of the monitored processes.",
+	usage="%monitor status"
 )
 async def status(ctx: commands.Context):
 	"""
