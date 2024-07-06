@@ -47,6 +47,43 @@ async def on_job_removed(event: Any):
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
 
+# ========= DISCORD EVENTS ==========
+
+@bot.event
+async def on_ready():
+	"""
+	Start processes when the bot is ready.
+	"""
+	logging.info(f"We have logged in as {bot.user}")
+	keep_alive.start()
+	scheduler.start()
+
+@bot.event
+async def on_message(message: discord.Message):
+	"""
+	Process messages sent by users.
+	"""
+	if message.author.bot:
+		# ignore messages from other bots
+		return
+
+	if isinstance(message.channel, DMChannel) or message.guild is None:
+		# ignore private messages and messages outside of a server
+		await message.channel.send(msg.get("no_dm"))
+		return
+
+	# process commands normally
+	await bot.process_commands(message)
+	
+@tasks.loop(minutes=1.0)
+async def keep_alive():
+	logging.info("Life signal")
+
+@keep_alive.before_loop
+async def before_keep_alive():
+	await bot.wait_until_ready()
+
+
 # ========= DISCORD COMMANDS ==========
 
 # Create a new help command
@@ -86,29 +123,6 @@ async def help(
 				embed.add_field(name=command.name, value=command.brief, inline=False)
 		await ctx.send(embed=embed, file=file)
 
-@bot.event
-async def on_ready():
-	"""
-	Start processes when the bot is ready.
-	"""
-	logging.info(f"We have logged in as {bot.user}")
-	keep_alive.start()
-	scheduler.start()
-
-@bot.event
-async def on_message(message: discord.Message):
-	if message.author.bot:
-		# ignore messages from other bots
-		return
-
-	if isinstance(message.channel, DMChannel) or message.guild is None:
-		# ignore private messages and messages outside of a server
-		await message.channel.send(msg.get("no_dm"))
-		return
-
-	# process commands normally
-	await bot.process_commands(message)
-
 @bot.command(
 		brief=msg.get("test_brief"),
 		description=msg.get("test_detail"),
@@ -121,14 +135,6 @@ async def test(
 ):
 	logging.info(f"Test command executed by {ctx.author}")
 	await ctx.send(msg.get("test_msg").format(arg0, arg1, arg0 + arg1))
-
-@tasks.loop(minutes=1.0)
-async def keep_alive():
-	logging.info("Life signal")
-
-@keep_alive.before_loop
-async def before_keep_alive():
-	await bot.wait_until_ready()
 
 if __name__ == "__main__":
 	bot.run(os.environ.get("DISCORD_TOKEN"))
