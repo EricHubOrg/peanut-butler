@@ -211,6 +211,8 @@ async def monitor(ctx: commands.Context):
 	await thread.send(msg.get("monitor_thread_details"))
 	await thread.send(msg.get("monitor_thread_command").format(command, active_keyword, inactive_keyword))
 
+	# close the thread
+	await thread.edit(archived=True)
 
 if __name__ == "__main__":
 	bot.run(os.environ.get("DISCORD_TOKEN"))
