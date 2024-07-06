@@ -5,7 +5,7 @@ import logging
 import json
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_REMOVED
-from typing import Any
+from typing import Any, Optional
 
 import discord
 from discord import Intents, DMChannel, Embed, Color
@@ -82,9 +82,9 @@ async def on_message(message: discord.Message):
 
 async def ask_question_thread(
 		thread: discord.Thread,
+		user_id: int,
 		question: str,
-		info: str,
-		user_id: int
+		info: Optional[str] = None,
 ) -> str:
 	"""
 	Ask a question in a thread and return the answer.
@@ -106,11 +106,15 @@ async def ask_question_thread(
 
 	while True:
 		# Wait for a response or a reaction
+		message_task = asyncio.create_task(bot.wait_for("message", check=check_response))
+		reaction_task = asyncio.create_task(bot.wait_for("reaction_add", check=check_reaction))
+		tasks = [message_task, reaction_task] if info else [message_task]
 		done, pending = await asyncio.wait(
-			[bot.wait_for("message", check=check_response),
-				bot.wait_for("reaction_add", check=check_reaction)],
+			tasks,
 			return_when=asyncio.FIRST_COMPLETED
 		)
+		for task in pending:
+			task.cancel()
 		if done:
 			# Get the result
 			completed_task = done.pop()
