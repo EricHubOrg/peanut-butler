@@ -34,21 +34,27 @@ async def read_from_file(filename: str) -> str:
 	content = await loop.run_in_executor(None, read_from_file_sync, filename)
 	return content
 
-def write_to_file_sync(filename, content):
+def write_to_file_sync(
+		filename: str,
+		content: str
+):
 	with open(filename, "w") as f:
 		f.write(content)
 
-async def write_to_file(filename, content):
+async def write_to_file(
+		filename: str,
+		content: str
+):
 	loop = asyncio.get_event_loop()
 	await loop.run_in_executor(None, write_to_file_sync, filename, content)
 
-def load_commands():
+def load_commands() -> list[dict[str, str]]:
     if os.path.exists(COMMANDS_FILE):
         with open(COMMANDS_FILE, "r") as file:
             return json.load(file)
     return []
 
-def save_commands(commands):
+def save_commands(commands: list[dict[str, str]]):
     with open(COMMANDS_FILE, "w") as file:
         json.dump(commands, file, indent=4)
 
