@@ -244,10 +244,14 @@ async def add(ctx: commands.Context):
     description=msg.get("monitor_remove_detail"),
 	usage="`%monitor remove [process_name]`"
 )
-async def remove(ctx: commands.Context, process_name: str):
+async def remove(ctx: commands.Context, *args: str):
+	"""
+	Remove a command from the list of monitored processes.
+	"""
+	process_name = " ".join(args)
 	commands = load_commands()
 	# Remove the command from the list
-	updated_commands = [cmd for cmd in commands if cmd["command"] != process_name]
+	updated_commands = [cmd for cmd in commands if cmd.get("name") != process_name]
 
 	if len(updated_commands) == len(commands):
 		await ctx.send(msg.get("monitor_remove_not_found").format(process_name))
