@@ -272,20 +272,41 @@ async def status(ctx: commands.Context):
 
 	statuses = []
 	for cmd in commands:
-		process_name = cmd.get("name", "unknown process")
-		command = cmd["command"]
-		active_keyword = cmd["active_keyword"]
-		inactive_keyword = cmd["inactive_keyword"]
-		
-		result = subprocess.run(command.split(), capture_output=True, text=True)
-		output = result.stdout + result.stderr
-
-		if active_keyword in output:
-			status = ":white_check_mark:"
-		elif inactive_keyword in output:
-			status = ":x:"
+		# Ensure no missing fields
+		for key in ["name", "command", "active_keyword", "inactive_keyword"]:
+			if key not in cmd or not cmd[key]:
+				status = ":warning:"
+				process_name = cmd.get("name", "Unknown")
+				process_name = f"{process_name} (missing {key})"
+				break
 		else:
-			status = ":grey_question:"
+			process_name = cmd["name"]
+			command = cmd["command"]
+			active_keyword = cmd["active_keyword"]
+			inactive_keyword = cmd["inactive_keyword"]
+			
+			# Run the command
+			result = subprocess.run(command.split(), capture_output=True, text=True)
+			output = result.stdout + result.stderr
+
+			# Check the status in the output
+			status = ""
+			if (active_keyword.startswith("!") and active_keyword[1:] not in output)\
+				or (active_keyword in output):
+				# The process is active
+				status = ":white_check_mark:"
+			elif (inactive_keyword.startswith("!") and inactive_keyword[1:] not in output)\
+				or (inactive_keyword in output):
+				# The process is inactive
+				if status:
+					# Both active and inactive keywords are found
+					status = ":warning:"
+					process_name = f"{process_name} (both active and inactive)"
+				else:
+					status = ":x:"
+			else:
+				# The status is unknown
+				status = ":grey_question:"
 
 		statuses.append(f"{status} {process_name}")
 
