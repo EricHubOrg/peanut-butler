@@ -63,5 +63,70 @@
 		"en": "Good afternoon",
 		"es": "Buenas tardes",
 		"ca": "Bona tarda"
+	},
+	"monitor_brief": {
+		"en": "Start monitoring a new process",
+		"es": "Comienza a monitorizar un nuevo proceso",
+		"ca": "Comença a monitoritzar un nou procés"
+	},
+	"monitor_detail": {
+		"en": "Interactively add a new command to monitor a process.",
+		"es": "Añade interactivamente un nuevo comando para monitorizar un proceso.",
+		"ca": "Afegeix interactivament un nou comandament per monitoritzar un procés."
+	},
+	"monitor_usage": {
+		"en": "`%monitor`",
+		"es": "`%monitor`",
+		"ca": "`%monitor`"
+	},
+	"monitor_thread_name": {
+		"en": "Monitor Process",
+		"es": "Monitorizar Proceso",
+		"ca": "Monitoritzar Procés"
+	},
+	"monitor_thread_intro": {
+		"en": "Let's set up a new command to monitor a process.",
+		"es": "Vamos a configurar un nuevo comando para monitorizar un proceso.",
+		"ca": "Anem a configurar un nou comandament per monitoritzar un procés."
+	},
+	"monitor_q_command": {
+		"en": "Enter the command to check status:",
+		"es": "Introduce el comando para comprobar el estado:",
+		"ca": "Introdueix el comandament per comprovar l'estat:"
+	},
+	"monitor_info_command": {
+		"en": "The command should return the status message of the process. E.g. `systemctl status myservice`",
+		"es": "El comando debería devolver el mensaje de estado del proceso. E.g. `systemctl status myservice`",
+		"ca": "El comandament hauria de retornar el missatge d'estat del procés. E.g. `systemctl status myservice`"
+	},
+	"monitor_q_active": {
+		"en": "Enter the keyword to indicate active status:",
+		"es": "Introduce la palabra clave para indicar estado activo:",
+		"ca": "Introdueix la paraula clau per indicar l'estat actiu:"
+	},
+	"monitor_info_active": {
+		"en": "If this keyword is present (or absent: indicate with `!<keyword>`) in the status message, the process is considered active.",
+		"es": "Si esta palabra clave está presente (o ausente: indicar con `!<palabra clave>`) en el mensaje de estado, el proceso se considera activo.",
+		"ca": "Si aquesta paraula clau està present (o absent: indicar amb `!<paraula clau>`) en el missatge d'estat, el procés es considera actiu."
+	},
+	"monitor_q_inactive": {
+		"en": "Enter the keyword to indicate inactive status:",
+		"es": "Introduce la palabra clave para indicar estado inactivo:",
+		"ca": "Introdueix la paraula clau per indicar l'estat inactiu:"
+	},
+	"monitor_thread_success": {
+		"en": "Command added successfully!",
+		"es": "¡Comando añadido correctamente!",
+		"ca": "Comandament afegit correctament!"
+	},
+	"monitor_thread_details": {
+		"en": "Here are the details:",
+		"es": "Aquí tienes los detalles:",
+		"ca": "Aquí tens els detalls:"
+	},
+	"monitor_thread_command": {
+		"en": "Command: `{}`\nActive Keyword: `{}`\nInactive Keyword: `{}`",
+		"es": "Comando: `{}`\nPalabra clave activo: `{}`\nPalabra clave inactivo: `{}`",
+		"ca": "Comandament: `{}`\nParaula clau actiu: `{}`\nParaula clau inactiu: `{}`"
 	}
 }

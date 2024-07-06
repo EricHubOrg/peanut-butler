@@ -1,3 +1,4 @@
+import asyncio
 from dotenv import load_dotenv
 import os
 import logging
@@ -10,15 +11,17 @@ import discord
 from discord import Intents, DMChannel, Embed, Color
 from discord.ext import commands, tasks
 
-from utils import reformat_lang_dict
+from utils import load_commands, reformat_lang_dict, save_commands
 
 load_dotenv()
 LANG = os.environ.get("LANG", "en")
+print(LANG)
+QUESTION_MARK = "❓"
 
 # Load messages in the selected language
 with open(os.path.join("data", "lang.json"), "r") as f:
 	lang_dict = json.load(f)
-msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANG, "en")
+msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANG)
 
 # Set up logging
 logging.basicConfig(
@@ -29,6 +32,8 @@ logging.basicConfig(
 # Set up the bot
 intents = Intents.default()
 intents.message_content = True
+intents.messages = True
+intents.reactions = True
 bot = commands.Bot(
 	command_prefix="%",
 	description=msg.get("bot_description"),
@@ -74,7 +79,47 @@ async def on_message(message: discord.Message):
 
 	# process commands normally
 	await bot.process_commands(message)
-	
+
+async def ask_question_thread(
+		thread: discord.Thread,
+		question: str,
+		info: str,
+		user_id: int
+) -> str:
+	"""
+	Ask a question in a thread and return the answer.
+	"""
+	message = await thread.send(question)
+	await message.add_reaction(QUESTION_MARK)
+
+	def check_response(m: discord.Message) -> bool:
+		# Check if the message is from the user in the thread
+		return m.channel == thread and m.author.id == user_id
+
+	def check_reaction(reaction: discord.Reaction, user: discord.User) -> bool:
+		# Check if the reaction is a question mark from the user in the thread
+		return (
+			user.id == user_id and
+			reaction.message.id == message.id and
+			str(reaction.emoji) == QUESTION_MARK
+		)
+
+	while True:
+		# Wait for a response or a reaction
+		done, pending = await asyncio.wait(
+			[bot.wait_for("message", check=check_response),
+				bot.wait_for("reaction_add", check=check_reaction)],
+			return_when=asyncio.FIRST_COMPLETED
+		)
+		if done:
+			# Get the result
+			completed_task = done.pop()
+			result = completed_task.result()
+			if isinstance(result, discord.Message): # Message
+				return result.content
+			elif isinstance(result, tuple): # Reaction
+				await thread.send(info)
+
 @tasks.loop(minutes=1.0)
 async def keep_alive():
 	logging.info("Life signal")
@@ -135,6 +180,37 @@ async def test(
 ):
 	logging.info(f"Test command executed by {ctx.author}")
 	await ctx.send(msg.get("test_msg").format(arg0, arg1, arg0 + arg1))
+
+@bot.command(
+	brief=msg.get("monitor_brief"),
+	description=msg.get("monitor_detail"),
+	usage=msg.get("monitor_usage")
+)
+async def monitor(ctx: commands.Context):
+	"""
+	Set up a new command to monitor a process.
+	"""
+	thread = await ctx.message.create_thread(name=msg.get("monitor_thread_name"))
+
+	await thread.send(msg.get("monitor_thread_intro"))
+
+	command = await ask_question_thread(thread, msg.get("monitor_q_command"), msg.get("monitor_info_command"), ctx.author.id)
+	active_keyword = await ask_question_thread(thread, msg.get("monitor_q_active"), msg.get("monitor_info_active"), ctx.author.id)
+	inactive_keyword = await ask_question_thread(thread, msg.get("monitor_q_inactive"), msg.get("monitor_info_inactive"), ctx.author.id)
+
+	# Save the command details
+	commands = load_commands()
+	commands.append({
+		"command": command,
+		"active_keyword": active_keyword,
+		"inactive_keyword": inactive_keyword
+	})
+	save_commands(commands)
+
+	await thread.send(msg.get("monitor_thread_success"))
+	await thread.send(msg.get("monitor_thread_details"))
+	await thread.send(msg.get("monitor_thread_command").format(command, active_keyword, inactive_keyword))
+
 
 if __name__ == "__main__":
 	bot.run(os.environ.get("DISCORD_TOKEN"))
