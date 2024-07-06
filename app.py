@@ -1,4 +1,5 @@
 import asyncio
+import subprocess
 from dotenv import load_dotenv
 import os
 import logging
@@ -219,6 +220,41 @@ async def monitor(ctx: commands.Context):
 
 	# close the thread
 	await thread.edit(archived=True)
+
+@bot.command(
+    brief="Check the status of monitored processes",
+    description="Run saved commands and print the status of the monitored processes."
+)
+async def status(ctx: commands.Context):
+	"""
+	Check the status of monitored processes.
+	"""
+	commands = load_commands()
+	if not commands:
+		await ctx.send("No commands to monitor.")
+		return
+
+	statuses = []
+	for cmd in commands:
+		process_name = cmd.get("p_name", "unknown process")
+		command = cmd["command"]
+		active_keyword = cmd["active_keyword"]
+		inactive_keyword = cmd["inactive_keyword"]
+		
+		result = subprocess.run(command.split(), capture_output=True, text=True)
+		output = result.stdout + result.stderr
+
+		if active_keyword in output:
+			status = ":white_check_mark:"
+		elif inactive_keyword in output:
+			status = ":x:"
+		else:
+			status = ":grey_question:"
+
+		statuses.append(f"{status} {process_name}")
+
+	await ctx.send("\n".join(statuses))
+
 
 if __name__ == "__main__":
 	bot.run(os.environ.get("DISCORD_TOKEN"))
