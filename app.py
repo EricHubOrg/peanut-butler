@@ -236,7 +236,7 @@ async def status(ctx: commands.Context):
 
 	statuses = []
 	for cmd in commands:
-		process_name = cmd.get("p_name", "unknown process")
+		process_name = cmd.get("name", "unknown process")
 		command = cmd["command"]
 		active_keyword = cmd["active_keyword"]
 		inactive_keyword = cmd["inactive_keyword"]
