@@ -58,6 +58,20 @@ async def on_job_removed(event: Any):
 scheduler.add_listener(on_job_removed, EVENT_JOB_REMOVED)
 
 
+def setup_ssh_agent():
+	"""
+	Set up the SSH agent.
+	"""
+	agent = subprocess.run(["ssh-agent", "-s"], stdout=subprocess.PIPE)
+	agent_info = agent.stdout.decode()
+	for line in agent_info.splitlines():
+		if line.startswith("SSH_AUTH_SOCK"):
+			os.environ["SSH_AUTH_SOCK"] = line.split("=")[1].strip(";")
+		elif line.startswith("SSH_AGENT_PID"):
+			os.environ["SSH_AGENT_PID"] = line.split("=")[1].strip(";")
+	subprocess.run(["ssh-add", "/root/.ssh/id_rsa"])
+
+
 # ========= DISCORD EVENTS ==========
 
 @bot.event
@@ -326,4 +340,5 @@ async def status(ctx: commands.Context):
 
 
 if __name__ == "__main__":
+	setup_ssh_agent()
 	bot.run(os.environ.get("DISCORD_TOKEN"))
