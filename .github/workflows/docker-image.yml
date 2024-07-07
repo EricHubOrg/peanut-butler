@@ -38,5 +38,6 @@ jobs:
         docker run -d --name peanut-butler \
           -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
           -e DISCORD_USER_ID=${{ secrets.DISCORD_USER_ID }} \
-          -e LANG=${{ secrets.LANG }} \
+          -e LANGUAGE=${{ secrets.LANGUAGE }} \
+          -v ${{ secrets.DATA_PATH }}:/usr/src/app/data \
           ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
