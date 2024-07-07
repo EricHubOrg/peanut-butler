@@ -1,5 +1,9 @@
 FROM python:3.9-slim
 
+ARG PORT
+ARG HOST
+ARG SSH_PRIVATE_KEY
+
 WORKDIR /usr/src/app
 
 COPY requirements.txt .
@@ -11,11 +15,9 @@ COPY . .
 
 # Add the keys and set permissions
 RUN mkdir -p /root/.ssh
-RUN echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
+RUN echo $SSH_PRIVATE_KEY > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
 
 # Add the host's key to known hosts
-ARG PORT
-ARG HOST
 RUN ssh-keyscan -p ${PORT} ${HOST} > /root/.ssh/known_hosts
 
 CMD ["python", "app.py"]

@@ -32,6 +32,7 @@ jobs:
         build-args: |
           PORT: ${{ secrets.PORT }}
           HOST: ${{ secrets.HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Deploy Docker container
       run: |
@@ -45,6 +46,5 @@ jobs:
           -e USERNAME=${{ secrets.USERNAME }} \
           -e HOST=${{ secrets.HOST }} \
           -e PORT=${{ secrets.PORT }} \
-          -e SSH_PRIVATE_KEY="${{ secrets.SSH_PRIVATE_KEY }}" \
           -v ${{ secrets.DATA_PATH }}:/usr/src/app/data \
           ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
