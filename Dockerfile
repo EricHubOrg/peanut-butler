@@ -15,9 +15,9 @@ COPY . .
 
 # Add the keys and set permissions
 RUN mkdir -p /root/.ssh
-RUN echo $SSH_PRIVATE_KEY > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
+RUN echo ${SSH_PRIVATE_KEY} > /root/.ssh/id_rsa && chmod 600 /root/.ssh/id_rsa
 
 # Add the host's key to known hosts
-RUN ssh-keyscan -p ${PORT} ${HOST} > /root/.ssh/known_hosts
+RUN export PORT=${PORT} HOST=${HOST} && ssh-keyscan -p $PORT $HOST > /root/.ssh/known_hosts
 
 CMD ["python", "app.py"]
