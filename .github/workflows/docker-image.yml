@@ -39,5 +39,8 @@ jobs:
           -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
           -e DISCORD_USER_ID=${{ secrets.DISCORD_USER_ID }} \
           -e LANGUAGE=${{ secrets.LANGUAGE }} \
+          -e USERNAME=${{ secrets.USERNAME }} \
+          -e HOST=${{ secrets.HOST }} \
+          -e PORT=${{ secrets.PORT }} \
           -v ${{ secrets.DATA_PATH }}:/usr/src/app/data \
           ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
