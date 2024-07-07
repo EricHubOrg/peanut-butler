@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 LANGUAGE = os.environ.get("LANGUAGE", "en")
-COMMANDS_FILE = os.path.join("data", "commands.json")
+DATA_PATH = "data"
+STATIC_PATH = "static"
+COMMANDS_FILE = os.path.join(DATA_PATH, "commands.json")
 
 def reformat_lang_dict(lang_dict: dict[str, dict[str, str]]) -> dict[str, dict[str, str]]:
 	"""
@@ -21,7 +23,7 @@ def reformat_lang_dict(lang_dict: dict[str, dict[str, str]]) -> dict[str, dict[s
 	return reformatted_dict
 
 # Load messages in the selected language
-with open(os.path.join("data", "lang.json"), "r") as f:
+with open(os.path.join(STATIC_PATH, "lang.json"), "r") as f:
 	lang_dict = json.load(f)
 msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANGUAGE, "en")
 

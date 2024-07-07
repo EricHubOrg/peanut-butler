@@ -16,11 +16,12 @@ from utils import load_commands, reformat_lang_dict, save_commands
 
 load_dotenv()
 LANGUAGE = os.environ.get("LANGUAGE", "en")
-print(LANGUAGE)
 QUESTION_MARK = "❓"
+DATA_PATH = "data"
+STATIC_PATH = "static"
 
 # Load messages in the selected language
-with open(os.path.join("data", "lang.json"), "r") as f:
+with open(os.path.join(STATIC_PATH, "lang.json"), "r") as f:
 	lang_dict = json.load(f)
 msg: dict[str, str] = reformat_lang_dict(lang_dict).get(LANGUAGE)
 
@@ -165,7 +166,7 @@ async def help(
 	else:
 		# List all commands
 		filename = "peanut_butler.png"
-		file = discord.File(os.path.join("data", "bot_data", filename), filename=filename)
+		file = discord.File(os.path.join(STATIC_PATH, filename), filename=filename)
 		embed = Embed(title="Peanut Butler", description=bot.description, color=color)
 		embed.set_thumbnail(url=f"attachment://{filename}")
 		embed.set_author(name="Eric Lopez", url="https://github.com/Pikurrot", icon_url="https://avatars.githubusercontent.com/u/90217719?v=4")
