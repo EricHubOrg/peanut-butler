@@ -274,6 +274,7 @@ async def status(ctx: commands.Context):
 	"""
 	Check and print the status of monitored processes.
 	"""
+	logging.info(f"Status command executed by {ctx.author}")
 	commands = load_commands()
 	if not commands:
 		await ctx.send(msg.get("monitor_status_empty"))
@@ -317,6 +318,7 @@ async def status(ctx: commands.Context):
 			else:
 				# The status is unknown
 				status = ":grey_question:"
+				logging.warning(f"Unknown status for {process_name}: {output}")
 
 		statuses.append(f"{status} {process_name}")
 
