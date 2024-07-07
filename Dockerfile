@@ -6,7 +6,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 RUN apt-get update && apt-get install -y openssh-client
-COPY ~/.ssh/id_rsa /root/.ssh/id_rsa
+COPY id_rsa /root/.ssh/id_rsa
 RUN chmod 600 /root/.ssh/id_rsa
 
 COPY . .
