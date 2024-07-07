@@ -25,10 +25,13 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
+        build-args: |
+          PORT: ${{ secrets.PORT }}
+          HOST: ${{ secrets.HOST }}
 
     - name: Deploy Docker container
       run: |
