@@ -19,6 +19,9 @@ LANGUAGE = os.environ.get("LANGUAGE", "en")
 QUESTION_MARK = "❓"
 DATA_PATH = "data"
 STATIC_PATH = "static"
+USERNAME = os.environ.get("USERNAME", "root")
+HOST = os.environ.get("HOST", "localhost")
+PORT = os.environ.get("PORT", "22")
 
 # Load messages in the selected language
 with open(os.path.join(STATIC_PATH, "lang.json"), "r") as f:
@@ -292,7 +295,8 @@ async def status(ctx: commands.Context):
 			inactive_keyword = cmd["inactive_keyword"]
 			
 			# Run the command
-			result = subprocess.run(command.split(), capture_output=True, text=True)
+			ssh = f"ssh {USERNAME}@{HOST} -p {PORT}"
+			result = subprocess.run(f"{ssh} {command}", shell=True, capture_output=True, text=True)
 			output = result.stdout + result.stderr
 
 			# Check the status in the output
