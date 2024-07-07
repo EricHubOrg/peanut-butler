@@ -30,9 +30,9 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
         build-args: |
-          PORT: ${{ secrets.PORT }}
-          HOST: ${{ secrets.HOST }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PORT=${{ secrets.PORT }}
+          HOST=${{ secrets.HOST }}
+          SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Deploy Docker container
       run: |
