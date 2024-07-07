@@ -1,0 +1,177 @@
+{
+	"bot_description": {
+		"en": "A bot to manage a private home server. Type `%help` to see available commands.",
+		"es": "Un bot para gestionar un servidor privado. Escribe `%help` para ver los comandos disponibles.",
+		"ca": "Un bot per gestionar un servidor privat. Escriu `%help` per veure els comandaments disponibles."
+	},
+	"help_brief": {
+		"en": "Shows this help message.",
+		"es": "Muestra este mensaje de ayuda.",
+		"ca": "Mostra aquest missatge d'ajuda."
+	},
+	"help_detail": {
+		"en": "Shows a list of available commands.",
+		"es": "Muestra una lista de comandos disponibles.",
+		"ca": "Mostra una llista de comandaments disponibles."
+	},
+	"help_usage": {
+		"en": "`%help (command)`",
+		"es": "`%help (comando)`",
+		"ca": "`%help (comandament)`"
+	},
+	"command_not_found": {
+		"en": "There is no command with name `{}`.",
+		"es": "No hay ningún comando con el nombre `{}`.",
+		"ca": "No hi ha cap comandament amb el nom `{}`."
+	},
+	"no_dm": {
+		"en": "Sorry yoy can't talk to me in private",
+		"es": "Lo siento, no puedes hablarme en privado",
+		"ca": "Ho sento, no em pots parlar en privat"
+	},
+	"test_brief": {
+		"en": "Brief description of the `test` command.",
+		"es": "Descripción breve del comando `test`.",
+		"ca": "Descripció breu del comandament `test`."
+	},
+	"test_detail": {
+		"en": "Detailed description of the `test` command.",
+		"es": "Descripción detallada del comando `test`.",
+		"ca": "Descripció detallada del comandament `test`."
+	},
+	"test_msg": {
+		"en": "Hello there! {} + {} = {}",
+		"es": "¡Hola! {} + {} = {}",
+		"ca": "Hola! {} + {} = {}"
+	},
+	"greeting_night": {
+		"en": "Good night",
+		"es": "Buenas noches",
+		"ca": "Bona nit"
+	},
+	"greeting_morning": {
+		"en": "Good morning",
+		"es": "Buenos días",
+		"ca": "Bon dia"
+	},
+	"greeting_afternoon": {
+		"en": "Good afternoon",
+		"es": "Buenas tardes",
+		"ca": "Bona tarda"
+	},
+	"monitor_brief": {
+		"en": "Monitor a process",
+		"es": "Monitoriza un proceso",
+		"ca": "Monitoritza un procés"
+	},
+	"monitor_detail": {
+		"en": "Add, remove or check the status of a process.",
+		"es": "Añade, elimina o comprueba el estado de un proceso.",
+		"ca": "Afegeix, elimina o comprova l'estat d'un procés."
+	},
+	"monitor_add_brief": {
+		"en": "Add a new process to monitor",
+		"es": "Añade un nuevo proceso para monitorizar",
+		"ca": "Afegeix un nou procés per monitoritzar"
+	},
+	"monitor_add_detail": {
+		"en": "Interactively add a new process to monitor.",
+		"es": "Añade interactivamente un nuevo proceso para monitorizar.",
+		"ca": "Afegeix interactivament un nou procés per monitoritzar."
+	},
+	"monitor_add_thread_name": {
+		"en": "Monitor Process",
+		"es": "Monitorizar Proceso",
+		"ca": "Monitoritzar Procés"
+	},
+	"monitor_add_thread_intro": {
+		"en": "Let's set up a new command to monitor a process.",
+		"es": "Vamos a configurar un nuevo comando para monitorizar un proceso.",
+		"ca": "Anem a configurar un nou comandament per monitoritzar un procés."
+	},
+	"monitor_add_q_name": {
+		"en": "Enter the name of the process:",
+		"es": "Introduce el nombre del proceso:",
+		"ca": "Introdueix el nom del procés:"
+	},
+	"monitor_add_q_command": {
+		"en": "Enter the command to check status:",
+		"es": "Introduce el comando para comprobar el estado:",
+		"ca": "Introdueix el comandament per comprovar l'estat:"
+	},
+	"monitor_add_info_command": {
+		"en": "The command should return the status message of the process. E.g. `systemctl status myservice`",
+		"es": "El comando debería devolver el mensaje de estado del proceso. E.g. `systemctl status myservice`",
+		"ca": "El comandament hauria de retornar el missatge d'estat del procés. E.g. `systemctl status myservice`"
+	},
+	"monitor_add_q_active": {
+		"en": "Enter the keyword to indicate active status:",
+		"es": "Introduce la palabra clave para indicar estado activo:",
+		"ca": "Introdueix la paraula clau per indicar l'estat actiu:"
+	},
+	"monitor_add_info_active": {
+		"en": "If this keyword is present (or absent: indicate with `!<keyword>`) in the status message, the process is considered active.",
+		"es": "Si esta palabra clave está presente (o ausente: indicar con `!<palabra clave>`) en el mensaje de estado, el proceso se considera activo.",
+		"ca": "Si aquesta paraula clau està present (o absent: indicar amb `!<paraula clau>`) en el missatge d'estat, el procés es considera actiu."
+	},
+	"monitor_add_q_inactive": {
+		"en": "Enter the keyword to indicate inactive status:",
+		"es": "Introduce la palabra clave para indicar estado inactivo:",
+		"ca": "Introdueix la paraula clau per indicar l'estat inactiu:"
+	},
+	"monitor_add_info_inactive": {
+		"en": "If this keyword is present (or absent: indicate with `!<keyword>`) in the status message, the process is considered inactive.",
+		"es": "Si esta palabra clave está presente (o ausente: indicar con `!<palabra clave>`) en el mensaje de estado, el proceso se considera inactivo.",
+		"ca": "Si aquesta paraula clau està present (o absent: indicar amb `!<paraula clau>`) en el missatge d'estat, el procés es considera inactiu."
+	},
+	"monitor_add_thread_success": {
+		"en": "Command added successfully!",
+		"es": "¡Comando añadido correctamente!",
+		"ca": "Comandament afegit correctament!"
+	},
+	"monitor_add_thread_details": {
+		"en": "Here are the details:",
+		"es": "Aquí tienes los detalles:",
+		"ca": "Aquí tens els detalls:"
+	},
+	"monitor_add_thread_command": {
+		"en": "Command: `{}`\nActive Keyword: `{}`\nInactive Keyword: `{}`",
+		"es": "Comando: `{}`\nPalabra clave activo: `{}`\nPalabra clave inactivo: `{}`",
+		"ca": "Comandament: `{}`\nParaula clau actiu: `{}`\nParaula clau inactiu: `{}`"
+	},
+	"monitor_remove_brief": {
+		"en": "Remove a process from monitoring",
+		"es": "Elimina un proceso de monitorización",
+		"ca": "Elimina un procés de monitorització"
+	},
+	"monitor_remove_detail": {
+		"en": "Remove a process from monitoring.",
+		"es": "Elimina un proceso de monitorización.",
+		"ca": "Elimina un procés de monitorització."
+	},
+	"monitor_remove_not_found": {
+		"en": "There is no monitored process with name `{}`.",
+		"es": "No hay ningún proceso monitorizado con el nombre `{}`.",
+		"ca": "No hi ha cap procés monitoritzat amb el nom `{}`."
+	},
+	"monitor_remove_success": {
+		"en": "Process `{}` removed successfully!",
+		"es": "¡Proceso `{}` eliminado correctamente!",
+		"ca": "Procés `{}` eliminat correctament!"
+	},
+	"monitor_status_brief": {
+		"en": "Check the status of all monitored processes",
+		"es": "Comprueba el estado de todos los procesos monitorizados",
+		"ca": "Comprova l'estat de tots els processos monitoritzats"
+	},
+	"monitor_status_detail": {
+		"en": "Check the status of all monitored processes.",
+		"es": "Comprueba el estado de todos los procesos monitorizados.",
+		"ca": "Comprova l'estat de tots els processos monitoritzats."
+	},
+	"monitor_status_empty": {
+		"en": "No processes to monitor.",
+		"es": "No hay procesos para monitorizar.",
+		"ca": "No hi ha processos per monitoritzar."
+	}
+}
