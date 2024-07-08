@@ -22,6 +22,9 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         
+    - name: Decode SSH private key
+      run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > id_ed25519
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
@@ -32,7 +35,6 @@ jobs:
         build-args: |
           PORT=${{ secrets.PORT }}
           HOST=${{ secrets.HOST }}
-          SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Deploy Docker container
       run: |
