@@ -21,7 +21,7 @@ ARG SSH_PRIVATE_KEY
 ARG SSH_PORT
 ARG SSH_HOST
 
-RUN echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_ed25519
+RUN echo "$SSH_PRIVATE_KEY" | base64 -d > /root/.ssh/id_ed25519
 RUN chmod 600 /root/.ssh/id_ed25519
 
 # Add the host's key to known hosts to avoid the first-time connection prompt
