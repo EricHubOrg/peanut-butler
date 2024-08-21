@@ -275,54 +275,56 @@ async def status(ctx: commands.Context):
 	Check and print the status of monitored processes.
 	"""
 	logging.info(f"Status command executed by {ctx.author}")
-	commands = load_commands()
-	if not commands:
-		await ctx.send(msg.get("monitor_status_empty"))
-		return
 
-	statuses = []
-	for cmd in commands:
-		# Ensure no missing fields
-		for key in ["name", "command", "active_keyword", "inactive_keyword"]:
-			if key not in cmd or not cmd[key]:
-				status = ":warning:"
-				process_name = cmd.get("name", "Unknown")
-				process_name = f"{process_name} (missing {key})"
-				break
-		else:
-			process_name = cmd["name"]
-			command = cmd["command"]
-			active_keyword = cmd["active_keyword"]
-			inactive_keyword = cmd["inactive_keyword"]
-			
-			# Run the command
-			ssh = f"ssh {USERNAME}@{HOST} -p {PORT}"
-			result = subprocess.run(f"{ssh} {command}", shell=True, capture_output=True, text=True)
-			output = result.stdout + result.stderr
+	async with ctx.typing():
+		commands = load_commands()
+		if not commands:
+			await ctx.send(msg.get("monitor_status_empty"))
+			return
 
-			# Check the status in the output
-			status = ""
-			if (active_keyword.startswith("!") and active_keyword[1:] not in output)\
-				or (active_keyword in output):
-				# The process is active
-				status = ":white_check_mark:"
-			elif (inactive_keyword.startswith("!") and inactive_keyword[1:] not in output)\
-				or (inactive_keyword in output):
-				# The process is inactive
-				if status:
-					# Both active and inactive keywords are found
+		statuses = []
+		for cmd in commands:
+			# Ensure no missing fields
+			for key in ["name", "command", "active_keyword", "inactive_keyword"]:
+				if key not in cmd or not cmd[key]:
 					status = ":warning:"
-					process_name = f"{process_name} (both active and inactive)"
-				else:
-					status = ":x:"
+					process_name = cmd.get("name", "Unknown")
+					process_name = f"{process_name} (missing {key})"
+					break
 			else:
-				# The status is unknown
-				status = ":grey_question:"
-				logging.warning(f"Unknown status for {process_name}: {output}")
+				process_name = cmd["name"]
+				command = cmd["command"]
+				active_keyword = cmd["active_keyword"]
+				inactive_keyword = cmd["inactive_keyword"]
+				
+				# Run the command
+				ssh = f"ssh {USERNAME}@{HOST} -p {PORT}"
+				result = subprocess.run(f"{ssh} {command}", shell=True, capture_output=True, text=True)
+				output = result.stdout + result.stderr
 
-		statuses.append(f"{status} {process_name}")
+				# Check the status in the output
+				status = ""
+				if (active_keyword.startswith("!") and active_keyword[1:] not in output)\
+					or (active_keyword in output):
+					# The process is active
+					status = ":white_check_mark:"
+				elif (inactive_keyword.startswith("!") and inactive_keyword[1:] not in output)\
+					or (inactive_keyword in output):
+					# The process is inactive
+					if status:
+						# Both active and inactive keywords are found
+						status = ":warning:"
+						process_name = f"{process_name} (both active and inactive)"
+					else:
+						status = ":x:"
+				else:
+					# The status is unknown
+					status = ":grey_question:"
+					logging.warning(f"Unknown status for {process_name}: {output}")
 
-	await ctx.send("\n".join(statuses))
+			statuses.append(f"{status} {process_name}")
+
+		await ctx.send("\n".join(statuses))
 
 
 if __name__ == "__main__":
