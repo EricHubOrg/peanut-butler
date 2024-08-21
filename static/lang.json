@@ -25,7 +25,7 @@
 		"ca": "No hi ha cap comandament amb el nom `{}`."
 	},
 	"no_dm": {
-		"en": "Sorry yoy can't talk to me in private",
+		"en": "Sorry you can't talk to me in private",
 		"es": "Lo siento, no puedes hablarme en privado",
 		"ca": "Ho sento, no em pots parlar en privat"
 	},

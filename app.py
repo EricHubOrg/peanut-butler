@@ -162,7 +162,7 @@ async def help(
 		command = bot.get_command(arg0)
 		if command:
 			embed = Embed(title=command.name, description=command.description, color=color)
-			embed.add_field(name="us", value=f"`{command.usage}`")
+			embed.add_field(name="use", value=f"`{command.usage}`")
 			await ctx.send(embed=embed)
 		else:
 			await ctx.send(msg.get("command_not_found").format(arg0))
@@ -203,7 +203,7 @@ async def monitor(ctx: commands.Context):
 	Group of commands to monitor processes.
 	"""
 	if ctx.invoked_subcommand is None:
-		await ctx.send("Invalid monitor command. Use `%monitor add` or `%monitor remove`.")
+		await ctx.send("Invalid monitor command. Use `%monitor status`, `%monitor add` or `%monitor remove`.")
 
 
 @monitor.command(

@@ -2,7 +2,6 @@ FROM python:3.9-slim
 
 ARG PORT
 ARG HOST
-ARG SSH_PRIVATE_KEY
 
 WORKDIR /usr/src/app
 
@@ -16,10 +15,6 @@ COPY . .
 
 # Add the private key and set permissions
 RUN mkdir -p /root/.ssh
-
-ARG SSH_PRIVATE_KEY
-ARG SSH_PORT
-ARG SSH_HOST
 
 COPY id_ed25519 /root/.ssh/id_ed25519
 RUN chmod 600 /root/.ssh/id_ed25519
