@@ -41,7 +41,7 @@ jobs:
         docker pull ${{ secrets.DOCKER_USERNAME }}/peanut-butler:latest
         docker stop peanut-butler || true
         docker rm peanut-butler || true
-        docker run -d --name peanut-butler \
+        docker run -d --restart=unless-stopped --name peanut-butler \
           -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
           -e LANGUAGE=${{ secrets.LANGUAGE }} \
           -e USERNAME=${{ secrets.USERNAME }} \
